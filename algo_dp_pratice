@@ -1,0 +1,534 @@
+Question of that 18 link
+
+
+Question 1
+Stone Game
+
+Alice and Bob play a game with piles of stones. There are an even number of piles arranged in a row, and each pile has a positive integer number of stones piles[i].
+The objective of the game is to end with the most stones. The total number of stones across all the piles is odd, so there are no ties.
+Alice and Bob take turns, with Alice starting first. Each turn, a player takes the entire pile of stones either from the beginning or from the end of the row. This continues until there are no more piles left, at which point the person with the most stones wins.
+Assuming Alice and Bob play optimally, return true if Alice wins the game, or false if Bob wins.
+
+Example 1:
+Input: piles = [5,3,4,5]
+Output: true
+Explanation: 
+Alice starts first, and can only take the first 5 or the last 5.
+Say she takes the first 5, so that the row becomes [3, 4, 5].
+If Bob takes 3, then the board is [4, 5], and Alice takes 5 to win with 10 points.
+If Bob takes the last 5, then the board is [3, 4], and Alice takes 4 to win with 9 points.
+This demonstrated that taking the first 5 was a winning move for Alice, so we return true.
+
+Ans:
+class Solution {
+    public boolean stoneGame(int[] piles) {
+        return true;
+    }
+}
+
+Question 2:
+Stone Game II
+
+Alice and Bob continue their games with piles of stones.  There are a number of piles arranged in a row, and each pile has a positive integer number of stones piles[i].  The objective of the game is to end with the most stones. 
+Alice and Bob take turns, with Alice starting first.  Initially, M = 1.
+On each player's turn, that player can take all the stones in the first X remaining piles, where 1 <= X <= 2M.  Then, we set M = max(M, X).
+The game continues until all the stones have been taken.
+Assuming Alice and Bob play optimally, return the maximum number of stones Alice can get.
+
+Example 1:
+Input: piles = [2,7,9,4,4]
+Output: 10
+Explanation:  If Alice takes one pile at the beginning, Bob takes two piles, then Alice takes 2 piles again. Alice can get 2 + 4 + 4 = 10 piles in total. If Alice takes two piles at the beginning, then Bob can take all three piles left. In this case, Alice get 2 + 7 = 9 piles in total. So we return 10 since it's larger. 
+
+Ans:
+// Approach 1: Naive Recursion (Brute Force Approach) - TLE
+
+// Time complexity: O(2^n)
+// Space complexity: O(2^n)
+
+class Solution {
+    int[] piles;
+    
+    public int stoneGameII(int[] piles) {
+        this.piles = piles;
+        return dfs(0, 0, 1);
+    }
+    
+    private int dfs(int p, int i, int m) {
+        if (i >= piles.length)
+            return 0;
+        
+        int res = p == 0 ? 0 : 1000000;
+        int total = 0;
+        
+        for (int x = 1; x <= 2 * m; x++) {
+            if (i + x > piles.length)
+                break;
+            
+            total += piles[i + x - 1];
+            
+            if (p == 0)
+                res = Math.max(res, total + dfs(1, i + x, Math.max(m, x)));
+            else
+                res = Math.min(res, dfs(0, i + x, Math.max(m, x)));
+        }
+        
+        return res;
+    }
+}
+
+Question 3:
+ Stone Game III
+
+Alice and Bob continue their games with piles of stones. There are several stones arranged in a row, and each stone has an associated value which is an integer given in the array stoneValue.
+Alice and Bob take turns, with Alice starting first. On each player's turn, that player can take 1, 2, or 3 stones from the first remaining stones in the row.
+The score of each player is the sum of the values of the stones taken. The score of each player is 0 initially.
+The objective of the game is to end with the highest score, and the winner is the player with the highest score and there could be a tie. The game continues until all the stones have been taken.
+Assume Alice and Bob play optimally.
+Return "Alice" if Alice will win, "Bob" if Bob will win, or "Tie" if they will end the game with the same score.
+Example 1:
+
+Input: stoneValue = [1,2,3,7]
+Output: "Bob"
+Explanation: Alice will always lose. Her best move will be to take three piles and the score become 6. Now the score of Bob is 7 and Bob wins.
+
+Ans:
+class Solution {
+    public String stoneGameIII(int[] stoneValue) {
+        int n = stoneValue.length;
+        int[] dp = new int[3];
+
+        for (int i = n - 1; i >= 0; i--) {
+            int takeOne = stoneValue[i] - dp[(i + 1) % 3];
+
+            int takeTwo = Integer.MIN_VALUE;
+            if (i + 1 < n)
+                takeTwo = stoneValue[i] + stoneValue[i + 1] - dp[(i + 2) % 3];
+
+            int takeThree = Integer.MIN_VALUE;
+            if (i + 2 < n)
+                takeThree = stoneValue[i] + stoneValue[i + 1] + stoneValue[i + 2] - dp[(i + 3) % 3];
+
+            dp[i % 3] = Math.max(Math.max(takeOne, takeTwo), takeThree);
+        }
+
+        int value = dp[0];
+        if (value > 0)
+            return "Alice";
+        else if (value < 0)
+            return "Bob";
+        else
+            return "Tie";
+    }
+}
+
+Question 4:
+ Stone Game IV
+
+Alice and Bob take turns playing a game, with Alice starting first.
+Initially, there are n stones in a pile. On each player's turn, that player makes a move consisting of removing any non-zero square number of stones in the pile.
+Also, if a player cannot make a move, he/she loses the game.
+Given a positive integer n, return true if and only if Alice wins the game otherwise return false, assuming both players play optimally.
+Example 1:
+
+Input: n = 1
+Output: true
+Explanation: Alice can remove 1 stone winning the game because Bob doesn't have any moves.
+
+Ans:
+class Solution {
+    Boolean[] dp = new Boolean[100001];
+
+        public boolean winnerSquareGame(int n) {
+            if (n == 0) return false;
+            if (dp[n] != null) return dp[n];
+            boolean winner = false;
+            for (int i = 1; i * i <= n; i++) {
+                if (!winnerSquareGame(n - i * i)) {
+                    winner = true;
+                    break;
+
+                }
+            }
+            return dp[n] = winner;
+        }
+}
+
+Question 5:
+ Stone Game V
+There are several stones arranged in a row, and each stone has an associated value which is an integer given in the array stoneValue.
+In each round of the game, Alice divides the row into two non-empty rows (i.e. left row and right row), then Bob calculates the value of each row which is the sum of the values of all the stones in this row. Bob throws away the row which has the maximum value, and Alice's score increases by the value of the remaining row. If the value of the two rows are equal, Bob lets Alice decide which row will be thrown away. The next round starts with the remaining row.
+The game ends when there is only one stone remaining. Alice's is initially zero.
+Return the maximum score that Alice can obtain.
+Example 1:
+Input: stoneValue = [6,2,3,4,5,5]
+Output: 18
+Explanation: In the first round, Alice divides the row to [6,2,3], [4,5,5]. The left row has the value 11 and the right row has value 14. Bob throws away the right row and Alice's score is now 11.
+In the second round Alice divides the row to [6], [2,3]. This time Bob throws away the left row and Alice's score becomes 16 (11 + 5).
+The last round Alice has only one choice to divide the row which is [2], [3]. Bob throws away the right row and Alice's score is now 18 (16 + 2). The game ends because only one stone is remaining in the row.
+
+Ans:
+class Solution {
+    Integer[][] dp;
+    public int stoneGameV(int[] stoneValue) {
+        dp = new Integer[stoneValue.length][stoneValue.length];
+        int total = 0;
+        for(int x:stoneValue){
+            total+=x;
+        }
+        return solve(stoneValue,0,stoneValue.length-1,total);
+    }
+
+    private int solve(int[] stones,int i,int j,int total){
+        if(i>=j){
+            return 0;
+        }
+        if(dp[i][j]!=null){
+            return dp[i][j];
+        }
+        int sum=0, result=0;
+        for(int k=i;k<=j;k++){
+            sum+=stones[k];
+            int max = 0;
+            if(2*sum<total){
+                max = sum+solve(stones,i,k,sum);
+            }
+            else if(2*sum>total){
+                max = total-sum + solve(stones,k+1,j,total-sum);
+            }
+            else{
+                max = Math.max(sum+solve(stones,i,k,sum), total-sum+solve(stones,k+1,j,total-sum));
+            }
+            result = Math.max(max,result);
+        }
+        return dp[i][j] = result;
+    }
+}
+
+Question 6:
+Stone Game VI
+Alice and Bob take turns playing a game, with Alice starting first.
+There are n stones in a pile. On each player's turn, they can remove a stone from the pile and receive points based on the stone's value. Alice and Bob may value the stones differently.
+You are given two integer arrays of length n, aliceValues and bobValues. Each aliceValues[i] and bobValues[i] represents how Alice and Bob, respectively, value the ith stone.
+The winner is the person with the most points after all the stones are chosen. If both players have the same amount of points, the game results in a draw. Both players will play optimally. Both players know the other's values.
+Determine the result of the game, and:
+If Alice wins, return 1.
+If Bob wins, return -1.
+If the game results in a draw, return 0.
+Example 1:
+Input: aliceValues = [1,3], bobValues = [2,1]
+Output: 1
+Explanation:
+If Alice takes stone 1 (0-indexed) first, Alice will receive 3 points.
+Bob can only choose stone 0, and will only receive 2 points.
+Alice wins.
+
+Ans:
+    public int stoneGameVI(int[] A, int[] B) {
+        int n = A.length;
+        int[][] sums = new int[n][];
+        for (int i = 0; i < n; i++) {
+            sums[i] = new int[] {A[i] + B[i], A[i], B[i]};
+        }
+        Arrays.sort(sums, (a, b) -> Integer.compare(b[0], a[0]));
+        int a = 0;
+        int b = 0;
+        for (int i = 0; i < n; i++) {
+            if (i % 2 == 0) {
+                a += sums[i][1];
+            } else {
+                b += sums[i][2];
+            }
+        }
+        return Integer.compare(a, b);
+    }
+ 
+ Question 7:
+ Stone Game VII
+Alice and Bob take turns playing a game, with Alice starting first.
+There are n stones arranged in a row. On each player's turn, they can remove either the leftmost stone or the rightmost stone from the row and receive points equal to the sum of the remaining stones' values in the row. The winner is the one with the higher score when there are no stones left to remove.
+Bob found that he will always lose this game (poor Bob, he always loses), so he decided to minimize the score's difference. Alice's goal is to maximize the difference in the score.
+Given an array of integers stones where stones[i] represents the value of the ith stone from the left, return the difference in Alice and Bob's score if they both play optimally.
+Example 1:
+Input: stones = [5,3,1,4,2]
+Output: 6
+Explanation: 
+- Alice removes 2 and gets 5 + 3 + 1 + 4 = 13 points. Alice = 13, Bob = 0, stones = [5,3,1,4].
+- Bob removes 5 and gets 3 + 1 + 4 = 8 points. Alice = 13, Bob = 8, stones = [3,1,4].
+- Alice removes 3 and gets 1 + 4 = 5 points. Alice = 18, Bob = 8, stones = [1,4].
+- Bob removes 1 and gets 4 points. Alice = 18, Bob = 12, stones = [4].
+- Alice removes 4 and gets 0 points. Alice = 18, Bob = 12, stones = [].
+The score difference is 18 - 12 = 6.
+
+Ans:
+class Solution {
+    public int stoneGameVII(int[] stones) {
+        int totalSum=0;
+        for(int i=0; i<stones.length ; i++){
+            totalSum+=stones[i];
+        }
+        return stoneGameVII(stones,totalSum,0,stones.length-1);
+    }
+    public int stoneGameVII(int[] stones, int totalSum, int si, int ei) {
+        if(si>ei || totalSum<=0){
+            return 0;
+        }
+        int a = (totalSum-stones[si])-stoneGameVII(stones,totalSum-stones[si],si+1,ei);
+        int b = (totalSum-stones[ei])-stoneGameVII(stones,totalSum-stones[ei],si,ei-1);
+        return Math.max(a,b);
+    }    
+}
+
+Question 8:
+Stone Game VIII
+Alice and Bob take turns playing a game, with Alice starting first.
+There are n stones arranged in a row. On each player's turn, while the number of stones is more than one, they will do the following:
+Choose an integer x > 1, and remove the leftmost x stones from the row.
+Add the sum of the removed stones' values to the player's score.
+Place a new stone, whose value is equal to that sum, on the left side of the row.
+The game stops when only one stone is left in the row.
+The score difference between Alice and Bob is (Alice's score - Bob's score). Alice's goal is to maximize the score difference, and Bob's goal is the minimize the score difference.
+Given an integer array stones of length n where stones[i] represents the value of the ith stone from the left, return the score difference between Alice and Bob if they both play optimally.
+Example 1:
+Input: stones = [-1,2,-3,4,-5]
+Output: 5
+Explanation:
+- Alice removes the first 4 stones, adds (-1) + 2 + (-3) + 4 = 2 to her score, and places a stone of
+  value 2 on the left. stones = [2,-5].
+- Bob removes the first 2 stones, adds 2 + (-5) = -3 to his score, and places a stone of value -3 on
+  the left. stones = [-3].
+The difference between their scores is 2 - (-3) = 5.
+Ans:
+    public int stoneGameVIII(int[] stones) {
+		// find the sum first
+        int[] sum = new int[stones.length];
+        sum[0] = stones[0];
+        for (int i = 1; i < stones.length; i++) {
+            sum[i] = sum[i - 1] + stones[i];
+        }
+		// apply dp
+        int[] dp = new int[stones.length];
+        dp[stones.length - 1] = sum[stones.length - 1];
+        for (int i = stones.length - 2; i >= 0; i--) {
+            dp[i] = Math.max(sum[i] - dp[i + 1], dp[i + 1]);
+        }
+		// alice cannot take only one stone, so it has to be starting from dp[1], not dp[0].
+        return dp[1];
+    }
+    
+    Question 9:
+    Stone Game IX
+Alice and Bob continue their games with stones. There is a row of n stones, and each stone has an associated value. You are given an integer array stones, where stones[i] is the value of the ith stone.
+Alice and Bob take turns, with Alice starting first. On each turn, the player may remove any stone from stones. The player who removes a stone loses if the sum of the values of all removed stones is divisible by 3. Bob will win automatically if there are no remaining stones (even if it is Alice's turn).
+Assuming both players play optimally, return true if Alice wins and false if Bob wins.
+Example 1:
+
+Input: stones = [2,1]
+Output: true
+Explanation: The game will be played as follows:
+- Turn 1: Alice can remove either stone.
+- Turn 2: Bob removes the remaining stone. 
+The sum of the removed stones is 1 + 2 = 3 and is divisible by 3. Therefore, Bob loses and Alice wins the game.
+
+Ans:
+ public boolean stoneGameIX(int[] stones) {
+        int[] cnt = new int[3];
+        for (int a: stones)
+            cnt[a % 3]++;
+        if (Math.min(cnt[1], cnt[2]) == 0)
+            return Math.max(cnt[1], cnt[2]) > 2 && cnt[0] % 2 > 0;
+        return Math.abs(cnt[1] - cnt[2]) > 2 || cnt[0] % 2 == 0;
+    }
+    
+    
+ Question 10:
+  Smallest Sufficient Team
+In a project, you have a list of required skills req_skills, and a list of people. The ith person people[i] contains a list of skills that the person has.Consider a sufficient team: a set of people such that for every required skill in req_skills, there is at least one person in the team who has that skill. We can represent these teams by the index of each person.
+For example, team = [0, 1, 3] represents the people with skills people[0], people[1], and people[3].
+Return any sufficient team of the smallest possible size, represented by the index of each person. You may return the answer in any order.
+It is guaranteed an answer exists.
+Example 1:
+
+Input: req_skills = ["java","nodejs","reactjs"], people = [["java"],["nodejs"],["nodejs","reactjs"]]
+Output: [0,2]
+
+Ans:
+import java.util.*;
+
+class Solution {
+    int[][] dp;
+    boolean[][] choice;
+    int req_mask, m;
+
+    public int solve(List<Integer> people, int i, int mask) {
+        if (mask == req_mask)
+            return 0;
+        if (i == m)
+            return 10000;
+        if (dp[mask][i] != -1)
+            return dp[mask][i];
+        int ans1 = solve(people, i + 1, mask | people.get(i)) + 1;
+        int ans2 = solve(people, i + 1, mask);
+        if (ans1 < ans2)
+            choice[mask][i] = true;
+        return dp[mask][i] = Math.min(ans1, ans2);
+    }
+
+    public int[] smallestSufficientTeam(String[] req_skills, List<List<String>> people_skills) {
+        int n = req_skills.length;
+        m = people_skills.size();
+
+        HashMap<String, Integer> skills = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            skills.put(req_skills[i], i);
+        }
+
+        List<Integer> people = new ArrayList<>();
+        for (List<String> v : people_skills) {
+            int h = 0;
+            for (String skill : v)
+                h |= 1 << skills.get(skill);
+            people.add(h);
+        }
+
+        req_mask = (1 << n) - 1;
+        dp = new int[1 << n][m];
+        choice = new boolean[1 << n][m];
+        for (int[] row : dp)
+            Arrays.fill(row, -1);
+        solve(people, 0, 0);
+
+        List<Integer> ans = new ArrayList<>();
+        int mask = 0;
+        for (int i = 0; i < m; i++) {
+            if (choice[mask][i]) {
+                ans.add(i);
+                mask |= people.get(i);
+            }
+            if (mask == req_mask)
+                break;
+        }
+
+        int[] result = new int[ans.size()];
+        for (int i = 0; i < ans.size(); i++)
+            result[i] = ans.get(i);
+
+        return result;
+    }
+}
+
+Question 11:
+Maximum path sum in matrix
+Given a NxN matrix of positive integers. There are only three possible moves from a cell Matrix[r][c].
+Matrix [r+1] [c]
+Matrix [r+1] [c-1]
+Matrix [r+1] [c+1]
+Starting from any column in row 0 return the largest sum of any of the paths up to row N-1.
+NOTE: We can start from any column in zeroth row and can end at any column in (N-1)th row.
+Example 1:
+
+Input: N = 2
+Matrix = {{348, 391},
+          {618, 193}}
+Output: 1009
+Explaination: The best path is 391 -> 618. 
+It gives the sum = 1009.
+Ans:
+class Solution{
+    static int maximumPath(int n, int mat[][])
+    {
+        int[][] dp = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0 && j == 0) 
+                    dp[i][j] = mat[i][j];
+                else {
+                    int left = 0, up = 0, right = 0;
+                    if (i > 0) {
+                        up = dp[i - 1][j];
+                        if (j > 0)
+                            left = dp[i - 1][j - 1];
+                        if (j < n - 1)
+                            right = dp[i - 1][j + 1];
+                    }
+                    dp[i][j] = mat[i][j] + Math.max(up, Math.max(left, right));
+                }
+            }
+        }
+        int ans = 0;
+        for (int j = 0; j < n; j++) {
+            ans = Math.max(ans, dp[n - 1][j]);
+        }
+       
+        return ans;
+    }
+}
+
+Question 12:
+N meetings in one room
+
+There is one meeting room in a firm. There are N meetings in the form of (start[i], end[i]) where start[i] is start time of meeting i and end[i] is finish time of meeting i.
+What is the maximum number of meetings that can be accommodated in the meeting room when only one meeting can be held in the meeting room at a particular time?
+Note: Start time of one chosen meeting can't be equal to the end time of the other chosen meeting.
+Example 1:
+
+Input:
+N = 6
+start[] = {1,3,0,5,8,5}
+end[] =  {2,4,6,7,9,9}
+Output: 
+4
+Explanation:
+Maximum four meetings can be held with
+given start and end timings.
+The meetings are - (1, 2),(3, 4), (5,7) and (8,9)
+Ans:
+
+class Tri {
+	int start;
+	int end;
+	int ind;
+	Tri(){
+		
+	}
+	Tri(int start, int end, int ind){
+		this.start=start;
+		this.end=end;
+		this.ind=ind;
+	}
+}
+
+class TriComparator implements Comparator<Tri>{
+	@Override
+	public int compare(Tri a, Tri b) {
+		if(a.end==b.end) {
+			return a.ind - b.ind;
+		}
+		return a.end - b.end;
+	}
+}
+
+class Solution 
+{
+    //Function to find the maximum number of meetings that can
+    //be performed in a meeting room.
+    public static int maxMeetings(int start[], int end[], int n)
+    {
+        // add your code here
+        ArrayList<Tri> arr=new ArrayList<>();
+		for(int i=0; i<start.length; i++) {
+			arr.add(new Tri(start[i], end[i], i));
+		}
+		TriComparator comp=new TriComparator();
+		Collections.sort(arr, comp);
+		int endLast=arr.get(0).end;
+		int cnt=1;
+		for(int i=1; i<arr.size(); i++) {
+			if(arr.get(i).start > endLast) {
+				cnt++;
+				endLast=arr.get(i).end;
+			}
+		}
+		return cnt;
+    }
+}

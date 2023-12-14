@@ -1,0 +1,1610 @@
+Murli sir adcoder 25 question
+
+Question 1:(Z-frog-3)
+Problem Statement
+There are N stones, numbered  1,2,…,N. For each i (1≤i≤N), the height of Stone i is h i . Here, h 1 <h 2 <⋯<h N holds.
+There is a frog who is initially on Stone 1. He will repeat the following action some number of times to reach Stone N:
+If the frog is currently on Stone i, jump to one of the following: Stone i+1,i+2,…,N. Here, a cost of 
+(h j −h i ) 2 +C is incurred, where j is the stone to land on.
+Find the minimum possible total cost incurred before the frog reaches Stone N
+sample input:
+5 6
+1 2 3 4 5
+sample output:
+20
+Ans:
+import java.io.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+class Main {
+	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	int N;
+	long C;
+	int[] h;
+	long[] dp; // dp[i] index i にたどり着いた時の最小コスト
+	CHT cht;
+
+	static int i(String s) { return Integer.parseInt(s); }
+	static long l(String s) { return Long.parseLong(s); }
+	
+	void calc() throws Exception {
+		String[] nc = br.readLine().split(" ");
+		N = i(nc[0]); C = l(nc[1]);
+		h = new int[N];
+		String[] hs = br.readLine().split(" ");
+		for (int i = 0; i < N; i++) h[i] = i(hs[i]);
+
+		dp = new long[N];
+		cht = new CHT();
+
+		for (int i = 1; i < N; i++) {
+			long a = -2L * h[i-1];
+			long b = dp[i-1] + (long)h[i-1] * h[i-1];
+			cht.add(a, b);
+			dp[i] = cht.min(h[i]) + (long)h[i] * h[i] + C;
+		}
+		System.out.println(dp[N-1]);
+	}
+
+	public static void main(String[] args) throws Exception {
+		new Main().calc();
+	}
+}
+
+class CHT {
+	Deque<long[]> deq = new ArrayDeque<>();
+
+	void add(long a1, long b1) {
+		while (deq.size() > 1) {
+			long[] c2 = deq.pollLast();
+			long[] c3 = deq.peekLast();
+			if ((b1 - c2[1])*(c2[0] - c3[0]) < (c2[1] - c3[1])*(a1 - c2[0])) {
+				deq.addLast(c2);
+				break;
+			}
+		}
+		deq.addLast(new long[] {a1, b1});
+	}
+
+	long min(int x) {
+		long[] c1, c2;
+		long v1, v2;
+		c1 = deq.pollFirst();
+		v1 = c1[0] * x + c1[1];
+		while (!deq.isEmpty()) {
+			c2 = deq.pollFirst();
+			v2 = c2[0] * x + c2[1];
+			if (v2 > v1) {
+				deq.addFirst(c2);
+				break;
+			}
+			c1 = c2; v1 = v2;
+		}
+		deq.addFirst(c1);
+		return v1;
+	}
+}
+
+Question 2:(U - Grouping)
+Problem Statement
+There are N rabbits, numbered 1,2,…,N.For each i,j (1≤i,j≤N), the compatibility of Rabbit i and j is described by an integer 
+a i,j. Here, a i,i=0 for each i (1≤i≤N), and a i,j =a j,i for each i and j (1≤i,j≤N).
+Taro is dividing the N rabbits into some number of groups. Here, each rabbit must belong to exactly one group. After grouping, for each 
+i and j (1≤i<j≤N), Taro earns a i,j points if Rabbit i and j belong to the same group.
+Find Taro's maximum possible total score.
+
+Sample input1:
+3
+0 10 20
+10 0 -100
+20 -100 0
+Sample output:
+20
+Ans:
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt(), up = 1 << n;
+        int[][] d = new int[n][n];
+        long[] dp = new long[up];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                d[i][j] = sc.nextInt();
+        for (int i = 0; i < up; i++)
+            for (int j = 0; j < n; j++)
+                if ((i >> j & 1) != 0)
+                    for (int k = 0; k < j; k++)
+                        if ((i >> k & 1) != 0)
+                            dp[i] += d[j][k];
+        for (int i = 1; i < up; i++)
+            for (int j = (i - 1) & i; j != 0; j = (j - 1) & i)
+                dp[i] = Math.max(dp[i], dp[j] + dp[i ^ j]);
+        System.out.print(dp[up - 1]);
+    }
+
+}
+
+Question 3:(A-frog 1)
+Problem Statement
+There are N stones, numbered 1,2,…,N. For each i (1≤i≤N), the height of Stone i is h i .
+There is a frog who is initially on Stone 1. He will repeat the following action some number of times to reach Stone 
+N:If the frog is currently on Stone i, jump to Stone i+1 or Stone i+2. Here, a cost of ∣h i −h j∣ is incurred, where 
+j is the stone to land on.Find the minimum possible total cost incurred before the frog reaches Stone N.
+Sample input 1:
+4
+10 30 40 20
+sample output:
+30
+Ans:
+import java.util.*;
+class Main{
+  public static void main(String [] args){
+    Scanner sc=  new Scanner(System.in);
+    int n= sc.nextInt();
+    int arr[]= new int[n];
+    for(int i=0;i<n;i++)
+      arr[i]=sc.nextInt();
+    int dp[]= new int[n];
+    Arrays.fill(dp,-1);
+    System.out.print(f(arr,n-1,dp));  
+  }
+  public static int f(int arr[],int n,int dp[]){
+    if(n==0)
+      return 0;
+    if(n==1)
+      return Math.abs(arr[1]-arr[0]);
+    if(dp[n]!=-1)
+      return dp[n];
+    int one= Math.abs(arr[n]-arr[n-1])+f(arr,n-1,dp);
+    int two= Math.abs(arr[n]-arr[n-2])+f(arr,n-2,dp);
+    return dp[n]=Math.min(one,two);
+  }
+}
+
+Question 4:(B-frog-2)
+Problem Statement
+There are N stones, numbered 1,2,…,N. For each i (1≤i≤N), the height of Stone i is h i.
+There is a frog who is initially on Stone 1. He will repeat the following action some number of times to reach Stone N:
+If the frog is currently on Stone i, jump to one of the following: Stone i+1,i+2,…,i+K. Here, a cost of ∣h i −h j
+​∣ is incurred, where j is the stone to land on.Find the minimum possible total cost incurred before the frog reaches Stone N.
+Sample input 1:
+5 3
+10 30 40 50 20
+ouput:
+30
+ans:
+import java.util.*;
+class Main{
+  public static void main(String [] args){
+    Scanner sc=  new Scanner(System.in);
+    int n= sc.nextInt();
+    int k= sc.nextInt();
+    int arr[]= new int[n];
+    for(int i=0;i<n;i++)
+      arr[i]=sc.nextInt();
+    int dp[]= new int[n];
+    Arrays.fill(dp,-1);
+    System.out.print(f(arr,n-1,k,dp));  
+  }
+  public static int f(int arr[],int n,int k,int dp[]){
+    if(n==0)
+      return 0;
+    int ans= Integer.MAX_VALUE;
+    if(dp[n]!=-1)
+      return dp[n];
+    for(int i=1;i<=k;i++){
+        if(n-i>=0){
+            int cost = Math.abs(arr[n]-arr[n-i])+f(arr,n-i,k,dp);
+            ans= Math.min(ans,cost);
+        }
+    }
+    return dp[n]=ans;
+  }
+}
+
+
+Question 5:(C-vacation)
+Problem Statement
+Taro's summer vacation starts tomorrow, and he has decided to make plans for it now.
+The vacation consists of N days. For each i (1≤i≤N), Taro will choose one of the following activities and do it on the 
+i-th day:A: Swim in the sea. Gain a i points of happiness.
+B: Catch bugs in the mountains. Gain b i points of happiness.
+C: Do homework at home. Gain c i points of happiness.
+As Taro gets bored easily, he cannot do the same activities for two or more consecutive days.
+Find the maximum possible total points of happiness that Taro gains.
+
+Sample input 1:
+3
+10 40 70
+20 50 80
+30 60 90
+
+Sample output 
+210
+Ans:
+import java.util.*;
+class Main{
+  public static void main(String [] args){
+    Scanner sc=  new Scanner(System.in);
+    int n= sc.nextInt();
+    int arr[][]= new int[n][3];
+    for(int i=0;i<n;i++){
+        for(int j=0;j<3;j++)
+          arr[i][j]=sc.nextInt();
+    }
+    int ans= Integer.MIN_VALUE;
+    int dp[][]= new int[n][3];
+    for(int row[]:dp)
+      Arrays.fill(row,-1);
+    for(int i=0;i<3;i++){
+        ans= Math.max(ans,f(arr,n-1,i,dp));
+    }
+    System.out.print(ans);
+  }
+  public static int f(int arr[][],int i,int j,int dp[][]){
+    if(i<0 || j<0 || j>=3)
+      return Integer.MIN_VALUE;
+    if(i==0)
+      return arr[i][j];
+    if(dp[i][j]!=-1)
+      return dp[i][j];
+    int ld= f(arr,i-1,j-1,dp)+arr[i][j];
+    int rd= f(arr,i-1,j+1,dp)+arr[i][j];
+    int ldd= f(arr,i-1,j-2,dp)+arr[i][j];
+    int rdd= f(arr,i-1,j+2,dp)+arr[i][j];
+    return dp[i][j]=Math.max(ld,Math.max(rd,Math.max(ldd,rdd)));
+  }
+}
+
+Question 6:(D-kanpsak-1)
+Problem Statement
+There are N items, numbered 1,2,…,N. For each i (1≤i≤N), Item i has a weight of w i and a value of v i.
+Taro has decided to choose some of the 
+N items and carry them home in a knapsack. The capacity of the knapsack is 
+W, which means that the sum of the weights of items taken must be at most W.
+Find the maximum possible sum of the values of items that Taro takes home.
+Sample input 1:
+3 8
+3 30
+4 50
+5 60
+
+Sample output
+90
+Ans:
+import java.util.*;
+class Main{
+  public static void main(String [] args){
+    Scanner sc=  new Scanner(System.in);
+    int N= sc.nextInt();
+    int W= sc.nextInt();
+    int weights[]= new int[N];
+    long profit[]= new long[N];
+    for(int i=0;i<N;i++){
+        weights[i]=sc.nextInt();
+        profit[i]=sc.nextLong();
+    }
+    long dp[][]= new long[N][W+1];
+    for(long arr[]:dp)
+      Arrays.fill(arr,-1);
+    System.out.print(f(weights,profit,N-1,W,dp));
+  }
+  public static long f(int weights[],long profit[],int i,int W,long dp[][]){
+      if(i==0){
+          if(weights[i]<=W)
+            return profit[i];
+          else
+            return 0;
+      }
+      if(dp[i][W]!=-1)
+        return dp[i][W];
+      long take=0;
+      if(weights[i]<=W)
+         take= profit[i]+f(weights,profit,i-1,W-weights[i],dp);
+      long nottake= f(weights,profit,i-1,W,dp);
+      return dp[i][W]=Math.max(take,nottake);
+  }
+}
+
+Question 7:(E-kanpsack-2)
+Problem Statement
+There are N items, numbered 1,2,…,N. For each i (1≤i≤N), Item i has a weight of w i and a value of v i.
+Taro has decided to choose some of the  
+N items and carry them home in a knapsack. The capacity of the knapsack is 
+W, which means that the sum of the weights of items taken must be at most W.
+Find the maximum possible sum of the values of items that Taro takes home.
+Sample input 1:
+3 8
+3 30
+4 50
+5 60
+
+
+sample output
+90
+ANS:
+import java.util.*;
+public class Main {
+	public static long INF = Long.MAX_VALUE - Integer.MAX_VALUE;
+	public static void main(String[] args) {
+		// TODO 自動生成されたメソッド・スタブ
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		int w = sc.nextInt();
+		int[] weight = new int[n + 1];
+		int[] val = new int[n + 1];
+		for(int i = 1;i <= n;i++) {
+			weight[i] = sc.nextInt();
+			val[i] = sc.nextInt();
+		}
+		long[][] dp = new long[n + 1][100001];//[i個目までのものについて][価値の合計がjのときの]の重さの最小値
+		for(int i = 0;i <= n;i++) {
+			for(int j = 0;j <= 100000;j++) {
+				dp[i][j] = INF;
+			}
+		}dp[0][0] = 0;
+		for(int i = 1;i <= n;i++) {
+			for(int j = 0;j <= 100000 - 1000;j++) {
+				dp[i][j] = Math.min(dp[i - 1][j],dp[i][j]);
+				if(dp[i - 1][j] == INF)continue;
+				//System.out.println(i + " " + j);
+				dp[i][j + val[i]] = Math.min(dp[i][j + val[i]], dp[i - 1][j] + weight[i]);
+				//System.out.println(dp[i][j + weight[i]]);
+			}
+		}long ans = 0;
+		for(int i = 0;i <= 100000;i++) {
+			if(dp[n][i] <= w) {
+				ans = i;
+			}
+		}System.out.print(ans);
+	}
+
+}
+
+Question 8:(F-lcs)
+Problem Statement
+You are given strings s and t. Find one longest string that is a subsequence of both s and t.
+Notes A subsequence of a string x is the string obtained by removing zero or more characters from 
+x and concatenating the remaining characters without changing the order.
+Sample input 1:
+axyb
+abyxb
+
+
+Sample output:
+axb
+Ans:
+import java.util.*;
+public class Main {
+
+	public static void main(String[] args) {
+		// TODO 自動生成されたメソッド・スタブ
+		Scanner sc = new Scanner(System.in);
+		String s = sc.next();
+		String t = sc.next();
+		String ans = "";
+		int[][] ml = new int[s.length() + 1][t.length() + 1];//[Sをi文字目][Tをj文字目]まで見たときの同一部分列の最大長
+		for(int i = 0;i < s.length();i++) {
+			for(int j = 0;j < t.length();j++){
+				if(s.charAt(i) == t.charAt(j)) {
+					ml[i + 1][j + 1] = Math.max(ml[i + 1][j + 1], ml[i][j] + 1);
+				}ml[i + 1][j + 1] = Math.max(ml[i + 1][j + 1],ml[i + 1][j]);
+				ml[i + 1][j + 1] = Math.max(ml[i + 1][j + 1], ml[i][j + 1]);
+			}
+		}int i = s.length();
+		int j = t.length();
+		while(i > 0 && j > 0) {
+			if(ml[i][j] == ml[i - 1][j]) {
+				i--;
+			}else if(ml[i][j] == ml[i][j - 1]){
+				j--;
+			}else {
+				ans = (char)s.charAt(i - 1) + ans;
+				i--;j--;
+			}
+		}
+		System.out.print(ans);
+	}
+
+}
+
+Question 9(G-LOngest path)
+Problem Statement
+There is a directed graph G with N vertices and M edges. The vertices are numbered 1,2,…,N, and for each i (1≤i≤M), the 
+i-th directed edge goes from Vertex x i to y i. 
+G does not contain directed cycles.
+Find the length of the longest directed path in 
+G. Here, the length of a directed path is the number of edges in it.
+Sample input
+4 5
+1 2
+1 3
+3 2
+2 4
+3 4
+
+Sample output
+3
+Ans:
+import java.util.*;
+public class Main {
+
+	public static void main(String[] args) {
+		// TODO 自動生成されたメソッド・スタブ
+		Scanner sc = new Scanner(System.in);
+		int n  =sc.nextInt();
+		int m = sc.nextInt();
+		Node[] node = new Node[n + 1];
+		for(int i = 1;i <= n;i++) {
+			node[i] = new Node();
+		}for(int i = 0;i < m;i++) {
+			int a = sc.nextInt();
+			int b = sc.nextInt();
+			node[a].list.add(b);
+		}int ans = 0;
+		for(int i = 1;i <= n;i++) {
+			ans = Math.max(ans,dfs(i,node,0));
+		}
+		System.out.print(ans);
+	}public static int dfs(int ind,Node[] node,int now) {
+		if(node[ind].retNum != -1) return node[ind].retNum;
+		int plus = 0;
+		for(int s:node[ind].list) {
+			plus =Math.max(plus, dfs(s,node,now) + 1) ;
+		}node[ind].retNum = now + plus;
+		return node[ind].retNum;
+				
+	}
+	public static class Node{
+		ArrayList<Integer> list;
+		int retNum;
+		public Node(){
+			list = new ArrayList<>();
+			retNum = -1;
+		}
+	}
+
+}
+Question 10(H-Grid-1)
+There is a grid with H horizontal rows and W vertical columns. Let (i,j) denote the square at the i-th row from the top and the 
+j-th column from the left.For each i and j (1≤i≤H, 1≤j≤W), Square (i,j) is described by a character a i,j. If a i,j is ., Square 
+(i,j) is an empty square; if a i,j is #, Square (i,j) is a wall square. It is guaranteed that Squares (1,1) and (H,W) are empty squares.
+Taro will start from Square (1,1) and reach (H,W) by repeatedly moving right or down to an adjacent empty square.
+Find the number of Taro's paths from Square (1,1) to (H,W). As the answer can be extremely large, find the count modulo 
+10 9+7.
+Sample input:
+3 4
+...#
+.#..
+....
+Smaple output
+3
+Ans:
+import java.util.Scanner;
+
+
+public class Main {
+    static boolean isValid(int i, int j, int n, int m) {
+        return ((i >= 0 && i < n) && (j >= 0 && j < m));
+    }
+
+    static int getCost(int idx, int jdx, int n, int m, int arr[][], int dp[][]) {
+        int mod = 1000000007;
+
+        if (!isValid(idx, jdx, n, m)) {
+            return 0;
+        }
+        if (idx == n-1 && jdx == m-1) {
+            return 1;
+        }
+
+        if (arr[idx][jdx] == 1) {
+            return 0;
+        }
+
+        if (dp[idx][jdx] != -1) {
+            return dp[idx][jdx];
+        }
+
+        int d = getCost(idx, jdx + 1, n, m, arr, dp);
+        int a = getCost(idx + 1, jdx, n, m, arr, dp);
+
+        return dp[idx][jdx] = (a%mod + d%mod)%mod;
+    }
+
+
+    public static void main(String[] args) {
+        int n, m, i, j;
+
+        Scanner scan = new Scanner(System.in);
+        n = scan.nextInt();
+        m = scan.nextInt();
+
+        int [][] arr = new int [n][m];
+        int [][] dp = new int[n + 1][m + 1];
+
+        for (i = 0; i < n; i++) {
+            String tmp = scan.next();
+            j = 0;
+            for (char c : tmp.toCharArray()) {
+                if (c == '.') {
+                    arr[i][j] = 0;
+                } else {
+                    arr[i][j] = 1;
+                }
+                dp[i][j] = -1;
+                j += 1;
+            }
+        }
+        getCost(0, 0, n, m, arr, dp);
+        int mod = 1000000007;
+        System.out.println(dp[0][0]%mod);
+    }
+}
+
+Question 11:(I-coins)
+Let N be a positive odd number.There are N coins, numbered 1,2,…,N. For each i (1≤i≤N), when Coin i is tossed, it comes up heads with probability p i and tails with probability 1−p i.
+Taro has tossed all the N coins. Find the probability of having more heads than tails.
+Sample input 1:
+3
+0.30 0.60 0.80
+
+Sample output:
+0.612
+Ans:
+import java.util.*;
+import java.util.Arrays;
+
+public class Main {
+
+    static double dp[][];
+    static int n;
+    static double arr[];
+
+    static double CoinsProbability(int i, int x){
+        if(x<=0) return 1;
+        if(i>=arr.length) return 0;
+
+        if(dp[i][x]!=-1) return dp[i][x];
+
+        double a = arr[i]*CoinsProbability(i+1,x-1);   // head
+        double b = (1-arr[i])*CoinsProbability(i+1,x);    // tail
+        return  dp[i][x] = a+b;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        n = sc.nextInt();
+        arr = new double[n];
+
+        for(int i=0; i<n; i++){
+            arr[i] = sc.nextDouble();
+        }
+        dp = new double[n+5][n+5];
+        for(var a : dp) Arrays.fill(a,-1);
+
+        System.out.println(CoinsProbability(0,(n+1)/2));
+    }
+}
+
+Question 12:(J-sushi)
+Problem Statement
+There are N dishes, numbered 1,2,…,N. Initially, for each i (1≤i≤N), Dish i has a i(1≤a i≤3) pieces of sushi on it.
+Taro will perform the following operation repeatedly until all the pieces of sushi are eaten:
+Roll a die that shows the numbers 1,2,…,N with equal probabilities, and let i be the outcome. If there are some pieces of sushi on Dish 
+i, eat one of them; if there is none, do nothing.
+Find the expected number of times the operation is performed before all the pieces of sushi are eaten.
+Sample input:
+3
+1 1 1
+Sample output
+5.5
+Ans:
+import java.util.Scanner;
+
+public class Main {
+
+    static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args){
+        int n = scanner.nextInt();
+        int[] count = new int[4];
+        for(int i = 0; i < n; i++){
+            int c = scanner.nextInt();
+            count[c]++;
+        }
+        double[][][] dp = new double[n + 1][n + 1][n + 1];
+        for(int i = 0; i <= n; i++){
+            for(int j = 0; j <= n; j++){
+                for(int k = 0; k <= n; k++){
+                    if(i + j + k == 0) continue;
+                    if(i + j + k > n) continue;
+                    dp[i][j][k]++;
+                    if(i > 0 && j + 1 <= n){
+                        dp[i][j][k] += dp[i-1][j+1][k] * i / n;
+                    }
+                    if(j > 0 && k + 1 <= n){
+                        dp[i][j][k] += dp[i][j-1][k+1] * j / n;
+                    }
+                    if(k > 0){
+                        dp[i][j][k] += dp[i][j][k-1] * k / n;
+                    }
+                    dp[i][j][k] /= (double) (i+j+k) / n;
+                }
+            }
+        }
+        System.out.printf("%.14f\n", dp[count[3]][count[2]][count[1]]);
+    }
+}
+
+Question 13:(K-stones)
+Problem Statement
+There is a set A={a 1,a 2,…,a N} consisting of N positive integers. Taro and Jiro will play the following game against each other.
+Initially, we have a pile consisting of K stones. The two players perform the following operation alternately, starting from Taro:
+Choose an element x in A, and remove exactly x stones from the pile.
+A player loses when he becomes unable to play. Assuming that both players play optimally, determine the winner.
+Sample input 
+2 4
+2 3
+
+sample output
+First
+
+Ans:
+import java.util.*;
+public class Main {
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		int k = sc.nextInt();
+		int[] maunt = new int[n];
+		boolean[] secWin = new boolean[k + 1];
+		for(int i = 0;i < n;i++) {
+			maunt[i]  =sc.nextInt();
+		}secWin[0] = true;
+		for(int i = 1;i <= k;i++) {
+			boolean firWin = false;
+			for(int j = 0;j < n;j++) {
+				if(i - maunt[j] < 0)break;
+				if(secWin[i - maunt[j]])firWin = true;
+			}if(!firWin) {
+				secWin[i] = true;
+			}
+		}System.out.print(secWin[k] ? "Second":"First");
+		
+	}
+
+}
+
+Question 14:(L-deque)
+Problem Statement
+Taro and Jiro will play the following game against each other.Initially, they are given a sequence a=(a 1
+​,a 2,…,a N). Until a becomes empty, the two players perform the following operation alternately, starting from Taro:
+Remove the element at the beginning or the end of a. The player earns x points, where x is the removed element.
+Let X and Y be Taro's and Jiro's total score at the end of the game, respectively. Taro tries to maximize 
+X−Y, while Jiro tries to minimize X−Y.
+Assuming that the two players play optimally, find the resulting value of X−Y.
+
+Sample input 
+4
+10 80 90 30
+sample output
+10
+Ans:
+import java.util.*;
+import java.io.*;
+
+public class Main {
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int n = Integer.parseInt(br.readLine());
+		String[] s = br.readLine().split(" ");
+		int[] arr = new int[n + 1];
+		long[][] dp = new long[n + 1][n + 1];
+
+		for (int i = 1; i <= n; i++) {
+			arr[i] = Integer.parseInt(s[i - 1]);
+			dp[i][i] = arr[i];
+		}
+
+		for (int i = 2; i <= n; i++)
+			for (int j = i - 1; j > 0; j--)
+				dp[i][j] = Math.max(arr[j] - dp[i][j + 1], arr[i] - dp[i - 1][j]);
+
+		System.out.println(dp[n][1]);
+	}
+
+}
+
+Question 15:(M-candies)
+Problem Statement
+There are N children, numbered 1,2,…,N.They have decided to share K candies among themselves. Here, for each i (1≤i≤N), Child 
+i must receive between 0 and a i candies (inclusive). Also, no candies should be left over.
+Find the number of ways for them to share candies, modulo 10 9+7.
+Here, two ways are said to be different when there exists a child who receives a different number of candies.
+Sample input:
+3 4
+1 2 3
+Sample output
+5
+Ans:
+import java.util.*;
+import java.io.*;
+
+public class Main {
+
+	public static final int mod = 1000000007;
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String[] s = br.readLine().split(" ");
+		int n = Integer.parseInt(s[0]);
+		int k = Integer.parseInt(s[1]);
+		int[] arr = new int[n + 1];
+		int[][] dp = new int[n + 1][k + 1];
+		int[] prefix = new int[k+1];
+		s = br.readLine().split(" ");
+
+		dp[0][0] = 1;
+		for (int i = 1; i <= n; i++) {
+			arr[i] = Integer.parseInt(s[i - 1]);
+			dp[i][0] = 1;
+		}
+
+		int max = 0;
+		for (int i = 1; i <= n; i++) {
+			prefix[0] = dp[i-1][0];
+			max += arr[i];
+			for (int j = 1; j <= max && j <=k; j++) {
+				prefix[j] = (dp[i-1][j]+ prefix[j-1]) % mod;
+				if (j-arr[i]-1 < 0) {
+					dp[i][j] = prefix[j];
+				} else {
+					dp[i][j] = (prefix[j]-prefix[j-arr[i]-1]+mod)%mod;
+				}
+			}
+		}
+		System.out.println(dp[n][k]);
+
+	}
+
+}
+
+Question 16:(N slimes)
+Problem Statement
+There are N slimes lining up in a row. Initially, the i-th slime from the left has a size of a i.
+Taro is trying to combine all the slimes into a larger slime. He will perform the following operation repeatedly until there is only one slime:Choose two adjacent slimes, and combine them into a new slime. The new slime has a size of x+y, where 
+x and y are the sizes of the slimes before combining them. Here, a cost of 
+x+y is incurred. The positional relationship of the slimes does not change while combining slimes.
+Find the minimum possible total cost incurred.
+Sample input:
+4
+10 20 30 40
+
+Sample output:
+190
+Ans:
+import java.util.*;
+import java.io.*;
+
+public class Main {
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int n = Integer.parseInt(br.readLine());
+		String[] s = br.readLine().split(" ");
+		long[] prefix = new long[n + 1];
+		for (int i = 0; i < n; i++)
+			prefix[i + 1] = prefix[i] + Integer.parseInt(s[i]);
+
+		long[][] dp = new long[n + 1][n + 1];
+
+		for (int i = 2; i <= n; i++) {
+			for (int j = i - 1; j > 0; j--) {
+				dp[j][i] = Long.MAX_VALUE;
+				for (int k = j; k < i; k++) {
+					long val = dp[j][k] + dp[k + 1][i] + (prefix[k] - prefix[j - 1]) + (prefix[i] - prefix[k]);
+					if (dp[j][i] > val)
+						dp[j][i] = val;
+				}
+			}
+		}
+		System.out.println(dp[1][n]);
+	}
+
+}
+
+Question 17:(O-matching)
+Problem Statement
+There are N men and N women, both numbered 1,2,…,N.For each i,j (1≤i,j≤N), the compatibility of Man 
+i and Woman j is given as an integer a i,j. If a i,j=1, Man i and Woman j are compatible; if a i,j=0, they are not.
+Taro is trying to make 
+N pairs, each consisting of a man and a woman who are compatible. Here, each man and each woman must belong to exactly one pair.
+Find the number of ways in which Taro can make N pairs, modulo 10 9+7.
+Sample input:
+3
+0 1 1
+1 0 1
+1 1 1
+
+
+Sample output:
+3
+
+Ans:
+import java.util.Scanner;
+
+public class Main {
+
+    static Scanner scanner = new Scanner(System.in);
+
+    static int n, mod = 1000000007;
+    static int[][] grid;
+    static Integer[][] dp;
+
+    static int dfs(int state, int i){
+        if(i == n){
+            return state == (1 << n) - 1? 1: 0;
+        }
+
+        if(dp[state][i] != null) return dp[state][i];
+
+        int res = 0;
+        for(int j = 0; j < n; j++){
+            if(grid[i][j] == 1 && (state & (1 << j)) == 0){
+                res += dfs(state | (1 << j), i + 1);
+                res %= mod;
+            }
+        }
+        return dp[state][i] = res % mod;
+    }
+
+    public static void main(String[] args){
+        n = scanner.nextInt();
+        grid = new int[n][n];
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                grid[i][j] = scanner.nextInt();
+            }
+        }
+        dp = new Integer[1 << n][n];
+        System.out.println(dfs(0, 0));
+    }
+}
+
+Question 18:(P-independent set)
+Problem Statement
+There is a tree with N vertices, numbered 1,2,…,N. For each i (1≤i≤N−1), the i-th edge connects Vertex x i
+​and y i.
+Taro has decided to paint each vertex in white or black. Here, it is not allowed to paint two adjacent vertices both in black.
+Find the number of ways in which the vertices can be painted, modulo 10 9+7.
+Sample input:
+3
+1 2
+2 3
+
+Sample output:
+5
+Ans:
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+    static final int MOD = 1000000007;
+
+    public static void main(String[] args) {
+        Scanner scn = new Scanner(System.in);
+        int n = scn.nextInt();
+        ArrayList<Integer>[] graph = new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        for (int i = 0; i < n - 1; i++) {
+            int u = scn.nextInt() - 1;
+            int v = scn.nextInt() - 1;
+            graph[u].add(v);
+            graph[v].add(u);
+        }
+        int[][] dp = new int[n][2];
+        for (int[] arr : dp) {
+            Arrays.fill(arr, 1);
+        }
+        solve(0, -1, graph, dp);
+
+        int result = (dp[0][0] + dp[0][1]) % MOD;
+        System.out.println(result);
+    }
+
+    public static void solve(int u, int p, ArrayList<Integer>[] graph, int[][] dp) {
+        if (checkLeaf(u, graph)) {
+            dp[u][0] = 1;
+            dp[u][1] = 1;
+            return;
+        }
+        for (int v : graph[u]) {
+            if (v == p)
+                continue;
+            solve(v, u, graph, dp);
+        }
+        for (int v : graph[u]) {
+            if (v == p)
+                continue;
+            int w = dp[v][0];
+            int b = dp[v][1];
+            dp[u][0] = (int) ((long) dp[u][0] * (w + b) % MOD);
+            dp[u][1] = (int) ((long) dp[u][1] * w % MOD);
+        }
+    }
+
+    public static boolean checkLeaf(int n, ArrayList<Integer>[] graph) {
+        if (n != 0 && graph[n].size() == 1)
+            return true;
+        return false;
+    }
+}
+
+Question 19(Q flower)
+Problem Statement
+There are N flowers arranged in a row. For each i (1≤i≤N), the height and the beauty of the 
+i-th flower from the left is h i and a i, respectively. Here, h 1,h 2,…,h N are all distinct.
+Taro is pulling out some flowers so that the following condition is met:
+The heights of the remaining flowers are monotonically increasing from left to right.
+Find the maximum possible sum of the beauties of the remaining flowers.
+Sample input:
+4
+3 1 4 2
+10 20 30 40
+
+Sample output
+60
+Ans:
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class Main {
+    private static final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+    private static final long MOD = 1000000000 + 7;
+
+    private static String readln() throws IOException {
+        return input.readLine();
+    }
+
+    private static int[] lineToIntArray(String input, String delimiter) {
+        return Collections.list(new StringTokenizer(input, delimiter))
+                .stream()
+                .map(token -> Integer.parseInt((String) token, 10))
+                .mapToInt(i -> i)
+                .toArray();
+    }
+
+    public static void main(String[] args) throws IOException {
+        int n = Integer.parseInt(readln(), 10);
+        int[] h = lineToIntArray(readln(), " ");
+        int[] a = lineToIntArray(readln(), " ");
+        solution(n, h, a);
+    }
+
+    public static void solution(int n, int[] h, int[] a) {
+        int[][] s = new int[n][2];
+        for (int i = 0; i < n; i++) {
+            s[i][0] = h[i];
+            s[i][1] = i;
+        }
+
+        Arrays.sort(s, Comparator.comparingInt(b -> b[0]));
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            map.put(s[i][1], i);
+        }
+
+        int len = 1;
+        while (len < n) {
+            len *= 2;
+        }
+        long[] tree = new long[2*len];
+        for (int i = 0; i < n; i++) {
+            long res = query(0, 0, n-1, 0, map.get(i) - 1, tree) + a[i];
+            update(0, 0, n-1, map.get(i), res, tree);
+        }
+
+        System.out.println(tree[0]);
+    }
+
+    private static long query(int root, int tl, int tr, int ql, int qr, long[] tree) {
+        if (tl >= ql && tr <= qr) return tree[root];
+        if (tl > qr || tr < ql) return 0;
+
+        int mid = (tl + tr) >> 1;
+        long left = query(2*mid + 1, tl, mid, ql, qr, tree);
+        long right = query(2*mid + 2, mid+1, tr, ql, qr, tree);
+        return Math.max(left, right);
+    }
+
+    private static void update(int root, int tl, int tr, int pos, long val, long[] tree) {
+        if (tl == tr) {
+            if (tl == pos) tree[root] = val;
+            return;
+        }
+
+        int mid = (tl + tr) >> 1;
+        if (pos <= mid) update(2*mid+1, tl, mid, pos, val, tree);
+        else update(2*mid+2, mid+1, tr, pos, val, tree);
+        tree[root] = Math.max(tree[2*mid+1], tree[2*mid+2]);
+    }
+}
+
+Question 20(R-walk)
+Problem Statement
+There is a simple directed graph G with N vertices, numbered 1,2,…,N.For each i and j (1≤i,j≤N), you are given an integer 
+a i,j that represents whether there is a directed edge from Vertex 
+i to j. If a i,j=1, there is a directed edge from Vertex i to j; if a i,j=0, there is not.
+Find the number of different directed paths of length K in G, modulo 10 9+7.
+We will also count a path that traverses the same edge multiple times.
+Sample input
+4 2
+0 1 0 0
+0 0 1 1
+0 0 0 1
+1 0 0 0
+
+Sample output
+6
+Ans:
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+class Main {
+	static long mod = (long) (1e9+7);
+	
+	public static void main (String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		
+		int N = Integer.parseInt(st.nextToken());
+		long k = Long.parseLong(st.nextToken());
+		
+		long[][] A = new long[N+1][N+1];
+		
+		for (int i = 1; i <= N; i++) {
+			st = new StringTokenizer(br.readLine());
+			for (int j = 1; j <= N; j++) {
+				A[i][j] = Long.parseLong(st.nextToken());
+			}
+		}
+		
+		br.close();
+		
+		
+		long[][] answer = pow(A, k);
+		
+		long r = 0;
+		
+		for (int i = 1; i <= N; i++) {
+			for (int j = 1; j <= N; j++) {
+				r += answer[i][j];
+				r %= mod;
+				
+				// System.out.print(answer[i][j] + " ");;
+			}
+			// System.out.println();
+		}
+		
+		System.out.println(r);
+	}
+	
+	static long[][] multiply(long[][] A, long[][] B) {
+		int n = A.length-1;
+		long[][] C = new long[n+1][n+1];
+		
+		
+		for (int i = 1; i <= n; i++) {
+			for (int j = 1; j <= n; j++) {
+				for (int k = 1; k <= n; k++) {
+					C[i][j] += A[i][k] * B[k][j];
+					C[i][j] %= mod;
+				}
+			}
+		}
+		
+		return C;
+	}
+	
+	static long[][] pow(long[][] A, long k) {
+		long[][] res = new long[A.length][A.length];
+		long[][] pow = new long[A.length][A.length];
+		
+		int n = A.length-1;
+		for (int i = 1; i <= n; i++) {
+			res[i][i] = 1;
+		}
+		
+		for (int i = 1; i <= n; i++) {
+			for (int j = 1; j <= n; j++) {
+				pow[i][j] = A[i][j];
+			}
+		}
+		
+		
+		while (k > 0) {
+			if (k%2 == 1) {
+				res = multiply(res, pow);
+			}
+			
+			pow = multiply(pow, pow);
+			k /= 2;
+		}
+		
+		return res;
+	}
+	
+}
+
+Question 21(S-digit sum)
+Problem Statement
+Find the number of integers between 1 and K (inclusive) satisfying the following condition, modulo 
+10 9+7:The sum of the digits in base ten is a multiple of D.
+Sample input:
+30
+4
+Sample output:
+6
+Ans:
+import java.io.*;
+import java.util.*;
+public class Main
+{
+    static long mod=1000000007;
+	public static void main(String[] args) {
+	    Scanner sc=new Scanner(System.in);
+		int d;
+		String k;
+		k=sc.next();
+		d=sc.nextInt();
+		long[][][] dp = new long[10002][100][2];
+        for (int i = 0; i <10001; i++)
+            for (int j = 0; j < 100; j++)
+                Arrays.fill(dp[i][j], -1);
+		System.out.println((sdigit(0,0,0,k,dp,d)+mod-1l)%mod);
+	}
+	public static long sdigit(int i,int sum,int f,String limit,long[][][] dp,long d)
+	{
+	    sum%=d;
+	    if(i==limit.length())
+	    {
+	        if(sum==0)
+	            return 1;
+	        else
+	            return 0;
+	    }
+	    if(dp[i][sum][f]!=-1)
+	        return dp[i][sum][f];
+	    long val=0;
+	    if(f==1)
+	    {
+	        for(int j=0;j<10;j++)
+	        {
+	            val+=sdigit(i+1,sum+j,1,limit,dp,d);
+	            val%=mod;
+	        }
+	    }
+	    else
+	    {
+	        for(int j=0;j<=limit.charAt(i)-'0';j++)
+	        {
+	            if(j<limit.charAt(i)-'0')
+	            {
+    	            val+=sdigit(i+1,sum+j,1,limit,dp,d);
+	            }
+	            else
+	            {
+	                val+=sdigit(i+1,sum+j,0,limit,dp,d);
+	            }
+	            val%=mod;
+	        }
+	    }
+	    return dp[i][sum][f]=val%mod;
+	}
+}
+
+Question 22(T-permutation)
+Problem Statement
+Let N be a positive integer. You are given a string s of length N−1, consisting of < and >.
+Find the number of permutations (p 1,p 2,…,p N) of (1,2,…,N) that satisfy the following condition, modulo 
+10 9+7:For each i (1≤i≤N−1), p i<p i+1 if the i-th character in s is <, and p i>p i+1
+​if the i-th character in s is >.
+Sample input:
+4
+<><
+
+Sample output:
+5
+Ans:
+//make sure to make new file!
+import java.io.*;
+import java.util.*;
+
+public class Main{
+   
+   public static long MOD = 1000000007L;
+   
+   public static void main(String[] args)throws IOException{
+      BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+      PrintWriter out = new PrintWriter(System.out);
+      
+      int n = Integer.parseInt(f.readLine());
+      
+      char[] array = f.readLine().toCharArray();
+      
+      long[][] dp = new long[n][n];    //dp[x][y] is # of ways to fill first x numbers, and last number is at yth position (y <= x)
+      dp[0][0] = 1L;
+      
+      for(int k = 0; k < n-1; k++){
+         long sum = 0L;
+         if(array[k] == '<'){
+            //last number can't be highest
+            for(int j = k; j >= 0; j--){
+               sum = (sum + dp[k][j] + MOD)%MOD;
+               dp[k+1][j] = sum;
+            }
+         } else {
+            //last number can't be lowest
+            for(int j = 1; j <= k+1; j++){
+               sum = (sum + dp[k][j-1] + MOD)%MOD;
+               dp[k+1][j] = sum;
+            }
+         }
+      }
+      
+      long answer = 0L;
+      for(int k = 0; k < n; k++){
+         answer = (answer + dp[n-1][k] + MOD)%MOD;
+      }
+      
+      out.println(answer);
+      
+      
+      
+      
+      
+      
+      
+      
+      out.close();
+   }
+   
+      
+}
+
+Question 23:(V-subtree)
+Problem Statement
+There is a tree with N vertices, numbered 1,2,…,N. For each i (1≤i≤N−1), the i-th edge connects Vertex x i
+​and y i.
+Taro has decided to paint each vertex in white or black, so that any black vertex can be reached from any other black vertex by passing through only black vertices.
+You are given a positive integer M. For each v (1≤v≤N), answer the following question:
+Assuming that Vertex v has to be black, find the number of ways in which the vertices can be painted, modulo M.
+
+Sample input:
+3 100
+1 2
+2 3
+
+Sample output:
+3
+4
+3
+Ans:
+import java.util.*;
+
+public class Main {
+    static int maxn = 100001, mod;
+    static long[] dp1 = new long[maxn], dp2 = new long[maxn], prod = new long[maxn];
+    static boolean[] mk = new boolean[maxn];
+    static List<Integer>[] g = new ArrayList[maxn];
+
+    static long dfs1(int node) {
+        mk[node] = true;
+        long ret = 1;
+        for (int p : g[node])
+            if (!mk[p])
+                ret = ret * (dfs1(p) + 1) % mod;
+        return dp1[node] = ret;
+    }
+
+    static void dfs2(int node) {
+        mk[node] = true;
+        long tmp = 1;
+        List<Integer> id = new ArrayList<>();
+        for (int p : g[node])
+            if (!mk[p]) {
+                prod[p] = tmp;
+                tmp = tmp * (dp1[p] + 1) % mod;
+                id.add(p);
+            }
+        tmp = 1;
+        for (int p = id.size() - 1; p >= 0; p--) {
+            dp2[id.get(p)] = ((tmp * prod[id.get(p)]) % mod * dp2[node] + 1) % mod;
+            tmp = tmp * (dp1[id.get(p)] + 1) % mod;
+            dfs2(id.get(p));
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt(), a, b;
+        for (int i = 1; i <= n; i++)
+            g[i] = new ArrayList<>();
+        mod = sc.nextInt();
+        for (int i = 1; i < n; i++) {
+            a = sc.nextInt();
+            b = sc.nextInt();
+            g[a].add(b);
+            g[b].add(a);
+        }
+        dp2[1] = 1;
+        dfs1(1);
+        Arrays.fill(mk, false);
+        dfs2(1);
+        for (int i = 1; i <= n; i++)
+            System.out.println(dp1[i] * dp2[i] % mod);
+    }
+
+}
+
+Question 24:(W-interval)
+Problem Statement
+Consider a string of length N consisting of 0 and 1. The score for the string is calculated as follows:For each 
+i (1≤i≤M), a i is added to the score if the string contains 1 at least once between the l i-th and r i-th characters (inclusive).
+Find the maximum possible score of a string.
+Sample input:
+5 3
+1 3 10
+2 4 -10
+3 5 10
+
+Sample output:
+20
+Ans:
+import java.util.*;
+
+public class Main {
+    final static int maxn = 200001;
+    final static long inf = -0x3fffffffffffffffl;
+
+    static long[] dp = new long[maxn * 4], lazy = new long[maxn * 4];
+    static Node[] d = new Node[maxn];
+
+    static void pushup(int n) {
+        dp[n] = Math.max(dp[n << 1], dp[n << 1 | 1]);
+    }
+
+    static void pushdown(int n) {
+        lazy[n << 1] += lazy[n];
+        lazy[n << 1 | 1] += lazy[n];
+        dp[n << 1] += lazy[n];
+        dp[n << 1 | 1] += lazy[n];
+        lazy[n] = 0;
+    }
+
+    static void point(int l, int r, int a, int n, long val) {
+        if (l == r) {
+            dp[n] = val;
+            return;
+        }
+        int mid = l + r >> 1;
+        pushdown(n);
+        if (a <= mid)
+            point(l, mid, a, n << 1, val);
+        else
+            point(mid + 1, r, a, n << 1 | 1, val);
+        pushup(n);
+    }
+
+    static void update(int l, int r, int a, int b, int n, long val) {
+        if (a <= l && b >= r) {
+            lazy[n] += val;
+            dp[n] += val;
+            return;
+        }
+        int mid = l + r >> 1;
+        pushdown(n);
+        if (a <= mid)
+            update(l, mid, a, b, n << 1, val);
+        if (b > mid)
+            update(mid + 1, r, a, b, n << 1 | 1, val);
+        pushup(n);
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt(), m = sc.nextInt(), a, b;
+        long c;
+        Node tp;
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        Arrays.fill(dp, inf);
+        for (int i = 0; i < m; i++)
+            d[i] = new Node(sc.nextInt(), sc.nextInt(), sc.nextLong());
+        d[m] = new Node(200001, 200001, 0);
+        point(0, n, 0, 1, 0);
+        Arrays.sort(d, 0, m);
+        for (int i = 1, j = 0; i <= n; i++) {
+            long temp = 0;
+            while (d[j].a == i) {
+                temp += d[j].c;
+                pq.add(new Node(d[j].b, d[j].a, d[j].c));
+                ++j;
+            }
+            if (temp!=0)
+                update(0, n, 0, i - 1, 1, temp);
+            point(0, n, i, 1, dp[1]);
+            while (!pq.isEmpty() && pq.peek().a == i) {
+                tp = pq.poll();
+                update(0, n, 0, tp.b - 1, 1, -tp.c);
+            }
+        }
+        System.out.println(dp[1]);
+    }
+
+}
+
+class Node implements Comparable<Node> {
+    int a, b;
+    long c;
+
+    public Node(int _a, int _b, long _c) {
+        a = _a;
+        b = _b;
+        c = _c;
+    }
+
+    public int compareTo(Node o) {
+        return a - o.a;
+    }
+}
+
+Question 25:(X-tower)
+Problem Statement
+There are N blocks, numbered 1,2,…,N. For each i (1≤i≤N), Block i has a weight of w i, a solidness of s i
+​and a value of v i.
+Taro has decided to build a tower by choosing some of the 
+N blocks and stacking them vertically in some order. Here, the tower must satisfy the following condition:
+For each Block i contained in the tower, the sum of the weights of the blocks stacked above it is not greater than s i.
+Find the maximum possible sum of the values of the blocks contained in the tower.
+Sample input:
+3
+2 2 20
+2 1 30
+3 1 40
+
+Sample output:
+50
+Ans:
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt(), a, b;
+        long[] dp = new long[20001];
+        Node[] d = new Node[n];
+        for (int i = 0; i < n; i++)
+            d[i] = new Node(sc.nextInt(), sc.nextInt(), sc.nextInt());
+        Arrays.sort(d);
+        for (int i = 0; i < n; i++)
+            for (int j = d[i].s; j >= 0; j--)
+                dp[j + d[i].w] = Math.max(dp[j + d[i].w], dp[j] + d[i].v);
+        long ans = 0;
+        for (int i = 20000; i >= 0; i--)
+            ans = Math.max(ans, dp[i]);
+        System.out.println(ans);
+    }
+}
+
+class Node implements Comparable<Node> {
+    int w, s, v;
+
+    public Node(int _w, int _s, int _v) {
+        w = _w;
+        s = _s;
+        v = _v;
+    }
+
+    public int compareTo(Node o) {
+        return w + s - o.w - o.s;
+    }
+}
+
+Question 26:()
+Problem Statement
+There is a grid with H horizontal rows and W vertical columns. Let (i,j) denote the square at the i-th row from the top and the 
+j-th column from the left.In the grid, N Squares (r 1,c 1),(r 2,c 2),…,(r N,c N) are wall squares, and the others are all empty squares. It is guaranteed that Squares (1,1) and (H,W) are empty squares.
+Taro will start from Square (1,1) and reach (H,W) by repeatedly moving right or down to an adjacent empty square.
+Find the number of Taro's paths from Square (1,1) to (H,W), modulo 10 9+7.
+Sample input
+3 4 2
+2 2
+1 4
+
+Sample output:
+3
+
+Ans:
+import java.util.*;
+
+public class Main {
+    static long mod = 1000000007;
+    static long[] fac = new long[200001], ifac = new long[200001];
+
+    static void pre(int n) {
+        fac[0] = ifac[0] = 1;
+        for (int i = 1; i <= n; i++) {
+            fac[i] = fac[i - 1] * i % mod;
+            ifac[i] = ifac[i - 1] * qp(i, mod - 2) % mod;
+        }
+    }
+
+    static long qp(long x, long n) {
+        long ret = 1;
+        while (n != 0) {
+            if ((n & 1) != 0)
+                ret = ret * x % mod;
+            x = x * x % mod;
+            n >>= 1;
+        }
+        return ret;
+    }
+
+    static long c(int a, int b) {
+        return fac[a + b] * ifac[a] % mod * ifac[b] % mod;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int h = sc.nextInt(), w = sc.nextInt(), n = sc.nextInt();
+        long[] dp = new long[n + 1];
+        Node[] d = new Node[n + 1];
+        pre(h + w);
+        for (int i = 0; i < n; i++)
+            d[i] = new Node(sc.nextInt(), sc.nextInt());
+        d[n] = new Node(h, w);
+        Arrays.sort(d);
+        for (int i = 0; i <= n; i++) {
+            dp[i] = c(d[i].h - 1, d[i].w - 1);
+            for (int j = 0; j < i; j++)
+                if (d[j].w <= d[i].w)
+                    dp[i] -= dp[j] * c(d[i].h - d[j].h, d[i].w - d[j].w) % mod;
+            dp[i] %= mod;
+        }
+        System.out.println((dp[n] + mod) % mod);
+    }
+}
+
+class Node implements Comparable<Node> {
+    int h, w;
+
+    public Node(int _h, int _w) {
+        h = _h;
+        w = _w;
+    }
+
+    public int compareTo(Node o) {
+        if (h != o.h)
+            return h - o.h;
+        return w - o.w;
+    }
+}
+
+
+

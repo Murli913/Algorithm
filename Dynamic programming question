@@ -1,0 +1,3297 @@
+Leetcode:
+
+Greddy algorithm
+
+
+Question 1:
+ Assign Cookies
+Assume you are an awesome parent and want to give your children some cookies. But, you should give each child at most one cookie.
+Each child i has a greed factor g[i], which is the minimum size of a cookie that the child will be content with; and each cookie j has a size s[j]. If s[j] >= g[i], we can assign the cookie j to the child i, and the child i will be content. Your goal is to maximize the number of your content children and output the maximum number.
+Example 1:
+Input: g = [1,2,3], s = [1,1]
+Output: 1
+Explanation: You have 3 children and 2 cookies. The greed factors of 3 children are 1, 2, 3. 
+And even though you have 2 cookies, since their size is both 1, you could only make the child whose greed factor is 1 content.
+You need to output 1.
+Ans:
+class Solution {
+    public int findContentChildren(int[] g, int[] s) {
+        Arrays.sort(g); // sort the children's greed factors in non-decreasing order
+        Arrays.sort(s); // sort the cookie sizes in non-decreasing order
+        int contentChildren = 0;
+        int i = 0; // pointer to the current child's greed factor
+        int j = 0; // pointer to the current cookie size
+        while (i < g.length && j < s.length) {
+            if (s[j] >= g[i]) { // if the current cookie can satisfy the current child's greed factor
+                contentChildren++;
+                i++;
+            }
+            j++;
+        }
+    return contentChildren;
+    }
+}        
+
+Question 2:
+ Lemonade Change
+At a lemonade stand, each lemonade costs $5. Customers are standing in a queue to buy from you and order one at a time (in the order specified by bills). Each customer will only buy one lemonade and pay with either a $5, $10, or $20 bill. You must provide the correct change to each customer so that the net transaction is that the customer pays $5.
+Note that you do not have any change in hand at first.
+Given an integer array bills where bills[i] is the bill the ith customer pays, return true if you can provide every customer with the correct change, or false otherwise.
+Example 1:
+Input: bills = [5,5,5,10,20]
+Output: true
+Explanation: 
+From the first 3 customers, we collect three $5 bills in order.
+From the fourth customer, we collect a $10 bill and give back a $5.
+From the fifth customer, we give a $10 bill and a $5 bill.
+Since all customers got correct change, we output true.
+AnS:
+class Solution {
+    public boolean lemonadeChange(int[] bills) {
+        Stack<Integer> stackOf5=new Stack();
+        Stack<Integer> stackOf10=new Stack();
+
+        for(int i=0;i<bills.length;i++)
+        {
+            int input=bills[i];
+            if(input==5)
+            {
+                stackOf5.push(input);
+            }
+
+            else if(input==10)
+            {
+                stackOf10.push(input);
+                if(stackOf5.empty())
+                return false;
+                else
+                stackOf5.pop();
+            }
+
+            else if(input==20)
+            {
+                if(!stackOf10.empty())
+                {
+                    stackOf10.pop();
+                    if(stackOf5.empty())
+                    return false;
+                    else
+                    stackOf5.pop();
+                }
+
+                else if(!stackOf5.empty())
+                {
+                    for(int j=0;j<3;j++)
+                    {
+                        if(stackOf5.empty())
+                        {
+                            return false;
+                        }
+                        stackOf5.pop();
+                    }
+                }
+
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+
+    }
+}
+
+Question 3:
+Valid Parenthesis String
+Given a string s containing only three types of characters: '(', ')' and '*', return true if s is valid.
+The following rules define a valid string:
+Any left parenthesis '(' must have a corresponding right parenthesis ')'.
+Any right parenthesis ')' must have a corresponding left parenthesis '('.
+Left parenthesis '(' must go before the corresponding right parenthesis ')'.
+'*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string "".
+ Example 1:
+Input: s = "()"
+Output: true
+Ans:
+class Solution {
+    public boolean checkValidString(String s) {
+        int openCount = 0;
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                openCount++;
+            } else if (c == ')') {
+                openCount--;
+            }
+            if (openCount < 0) return false;    // Currently, don't have enough open parentheses to match close parentheses-> Invalid
+                                                // For example: ())(
+        }
+        return openCount == 0; // Fully match open parentheses with close parentheses
+    }
+}
+
+Question 4:
+Jump Game
+You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
+Return true if you can reach the last index, or false otherwise.
+Example 1:
+Input: nums = [2,3,1,1,4]
+Output: true
+Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Ans:
+class Solution {
+    public boolean canJump(int[] nums) {
+       int reachable = 0;
+       for(int i = 0; i < nums.length; i ++) {
+           if(i > reachable) return false;
+           reachable = Math.max(reachable, i + nums[i]);
+       } 
+       return true;
+    }
+}
+
+Question 5:
+Jump Game II
+You are given a 0-indexed array of integers nums of length n. You are initially positioned at nums[0].
+Each element nums[i] represents the maximum length of a forward jump from index i. In other words, if you are at nums[i], you can jump to any nums[i + j] where:
+0 <= j <= nums[i] and
+i + j < n
+Return the minimum number of jumps to reach nums[n - 1]. The test cases are generated such that you can reach nums[n - 1].
+Example 1:
+Input: nums = [2,3,1,1,4]
+Output: 2
+Explanation: The minimum number of jumps to reach the last index is 2. Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Ans:
+class Solution {
+    public int jump(int[] nums) {
+          int i =0;
+            int counter=0;
+            if(nums.length==1)
+            return 0;
+        while(i<nums.length)
+        {//System.out.println(i);
+        counter++;
+            int range = i+nums[i];
+            if(range>=nums.length-1)
+             break;
+            int max=0;
+            int temp=0;
+            for( int k=i+1;k<=range;k++)
+            {
+                if(nums[k]+k>=max)
+                {
+                    max=nums[k]+k;
+                    temp=k;
+                }
+                //System.out.println("index->"+i+"maxrange->"+max);
+            }
+            i=temp;
+        }
+        return counter;
+    }
+}
+
+Question 6:
+Non-overlapping Intervals
+Given an array of intervals intervals where intervals[i] = [starti, endi], return the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.
+Example 1:
+Input: intervals = [[1,2],[2,3],[3,4],[1,3]]
+Output: 1
+Explanation: [1,3] can be removed and the rest of the intervals are non-overlapping.
+Ans:
+class Solution {
+    public int eraseOverlapIntervals(int[][] intervals) {
+        int n = intervals.length;
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[1], b[1]));
+
+        int prev = 0;
+        int count = 1;
+
+        for (int i = 1; i < n; i++) {
+            if (intervals[i][0] >= intervals[prev][1]) {
+                prev = i;
+                count++;
+            }
+        }
+        return n - count;
+    }
+}
+
+Question 7:
+Merge Intervals
+Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+Example 1:
+Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
+Ans:
+class Solution {
+    public int[][] merge(int[][] intervals) {
+		int min = Integer.MAX_VALUE;
+		int max = Integer.MIN_VALUE;
+		
+		for (int i = 0; i < intervals.length; i++) {
+			min = Math.min(min, intervals[i][0]);
+			max = Math.max(max, intervals[i][0]);
+		}
+		
+		int[] range = new int[max - min + 1];
+		for (int i = 0; i < intervals.length; i++) {
+			range[intervals[i][0] - min] = Math.max(intervals[i][1] - min, range[intervals[i][0] - min]); 
+		}
+		
+		int start = 0, end = 0;
+		LinkedList<int[]> result = new LinkedList<>();
+		for (int i = 0; i < range.length; i++) {
+			if (range[i] == 0) {
+				continue;
+			}
+			if (i <= end) {
+				end = Math.max(range[i], end);
+			} else {
+				result.add(new int[] {start + min, end + min});
+				start = i;
+				end = range[i];
+			}
+		}
+		result.add(new int[] {start + min, end + min});
+		return result.toArray(new int[result.size()][]);
+	}
+}
+
+Question 8:
+Insert Interval
+You are given an array of non-overlapping intervals intervals where intervals[i] = [starti, endi] represent the start and the end of the ith interval and intervals is sorted in ascending order by starti. You are also given an interval newInterval = [start, end] that represents the start and end of another interval.
+Insert newInterval into intervals such that intervals is still sorted in ascending order by starti and intervals still does not have any overlapping intervals (merge overlapping intervals if necessary).
+Return intervals after the insertion.
+Example 1:
+Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+Output: [[1,5],[6,9]]
+Ans:
+class Solution {
+    public int[][] insert(int[][] intervals, int[] newInterval) {
+        int [][] merged = new int[intervals.length+1][];
+        int c = 0;
+        for (int []i : intervals) {
+            merged[c++] = i;
+        }
+        merged[intervals.length] = newInterval;
+        Arrays.sort(merged , (a,b) -> Integer.compare(a[0], b[0]));
+        List<int []> l1 = new ArrayList<>();
+        for(int [] arr : merged){
+            if(l1.size() == 0) l1.add(arr);
+            else{
+                int [] prevArr = l1.get(l1.size()-1);
+                if(arr[0] <= prevArr[1]){
+                    prevArr[1] = Math.max(prevArr[1] , arr[1]);
+                }
+                else l1.add(arr);
+            }
+        }
+        return l1.toArray(new int[l1.size()][]);
+    }
+}
+
+Question 9:
+
+
+
+
+
+
+
+
+
+DYnamic programming
+
+
+
+Question 1
+
+Climbing Stairs
+You are climbing a staircase. It takes n steps to reach the top.
+Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+Example 1:
+Input: n = 2
+Output: 2
+Explanation: There are two ways to climb to the top.
+1. 1 step + 1 step
+2. 2 steps
+Ans: using recursion
+class Solution {
+    public int climbStairs(int n) {
+        if (n == 0 || n == 1) {
+            return 1;
+        }
+        return climbStairs(n-1) + climbStairs(n-2);
+    }
+}
+
+using tabulation
+class Solution {
+    public int climbStairs(int n) {
+        if (n == 0 || n == 1) {
+            return 1;
+        }
+
+        int[] dp = new int[n+1];
+        dp[0] = dp[1] = 1;
+        
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i-1] + dp[i-2];
+        }
+        return dp[n];
+    }
+}
+
+
+Question 2:
+House Robber
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+Example 1:
+Input: nums = [1,2,3,1]
+Output: 4
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+Total amount you can rob = 1 + 3 = 4.
+Ans:
+class Solution {
+    public int rob(int[] nums) {
+        if(nums.length==1) return nums[0];
+        int dp[]=new int[nums.length];
+        dp[0]=nums[0];
+        dp[1]=Math.max(nums[0],nums[1]);
+        for(int i=2;i<nums.length;i++){
+            if(dp[i]>0) return dp[i];
+            dp[i]=Math.max(nums[i]+dp[i-2],dp[i-1]);
+        }
+        return dp[nums.length-1];
+    }
+}
+
+
+Question 3:
+House Robber II
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have a security system connected, and it will automatically contact the police if two adjacent houses were broken into on the same night.
+Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+Example 1:
+Input: nums = [2,3,2]
+Output: 3
+Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are adjacent houses.
+Ans:
+
+class Solution {
+    public int rob(int[] nums) {
+        
+		//2 solution arrays
+        int[][] solution = new int[nums.length][2];
+        
+        if(nums.length == 1)
+            return nums[0];
+        
+		//base cases
+        solution[0][0] = nums[0];
+        solution[0][1] = 0;
+        solution[1][0] = solution[0][0];
+        solution[1][1] = nums[1];
+        
+		//iterate over solution array
+        for(int i = 2; i < solution.length; i++){
+			//if on last house, set path with the start house = to prior max
+			//keep dichotemy of take or leave cell on the path without the start house
+            if(i == solution.length-1){
+                solution[i][0] = solution[i-1][0];
+                solution[i][1] = Math.max(solution[i-2][1] + nums[i], solution[i-1][1]);
+                break;
+            }
+			//Bellman Equation
+            solution[i][0] = Math.max(solution[i-2][0] + nums[i], solution[i-1][0]);
+            solution[i][1] = Math.max(solution[i-2][1] + nums[i], solution[i-1][1]);
+        }
+        
+		//return max of path without and with start house which is our solution
+        return Math.max(solution[nums.length-1][1], solution[nums.length-1][0]);
+    }
+}
+
+
+Question 3:
+
+Unique Paths
+There is a robot on an m x n grid. The robot is initially located at the top-left corner (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only move either down or right at any point in time.
+
+Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+
+The test cases are generated so that the answer will be less than or equal to 2 * 109.
+
+example 1: 
+Input: m = 3, n = 7
+Output: 28
+Ans:
+
+class Solution {
+    public int uniquePaths(int m, int n) {
+        // Create a 2D DP array filled with zeros
+        int[][] dp = new int[m][n];
+        
+        // Initialize the rightmost column and bottom row to 1
+        for (int i = 0; i < m; i++) {
+            dp[i][n-1] = 1;
+        }
+        for (int j = 0; j < n; j++) {
+            dp[m-1][j] = 1;
+        }
+        
+        // Fill in the DP array bottom-up
+        for (int i = m - 2; i >= 0; i--) {
+            for (int j = n - 2; j >= 0; j--) {
+                dp[i][j] = dp[i+1][j] + dp[i][j+1];
+            }
+        }
+        
+        // Return the result stored in the top-left corner
+        return dp[0][0];
+    }
+}
+
+Question 4:
+Unique Paths II
+You are given an m x n integer array grid. There is a robot initially located at the top-left corner (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only move either down or right at any point in time.
+An obstacle and space are marked as 1 or 0 respectively in grid. A path that the robot takes cannot include any square that is an obstacle.
+Return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+The testcases are generated so that the answer will be less than or equal to 2 * 109.
+Input: obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]
+Output: 2
+Explanation: There is one obstacle in the middle of the 3x3 grid above.
+There are two ways to reach the bottom-right corner:
+1. Right -> Right -> Down -> Down
+2. Down -> Down -> Right -> Right
+
+Ans:
+class Solution {
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m=obstacleGrid.length;
+        int n= obstacleGrid[0].length;
+        if(obstacleGrid[0][0]==1 || obstacleGrid[m-1][n-1]==1)
+        {
+            return 0;
+        }
+        int[][] res = new int[m][n];
+        res[0][0]=1;
+        for(int i=1;i<m;i++)
+        {
+           if(obstacleGrid[i][0]==0)
+           {
+               res[i][0]=res[i-1][0];
+           }
+        }
+        for(int i=1;i<n;i++)
+        {
+            if(obstacleGrid[0][i]==0)
+            {
+                res[0][i]=res[0][i-1];
+            }
+        }
+        for(int i=1;i<m;i++)
+        {
+            for(int j=1;j<n;j++)
+            {
+                if(obstacleGrid[i][j]==0)
+                {
+                    res[i][j]=res[i-1][j] + res[i][j-1];
+                }
+            }
+        }
+        return res[m-1][n-1];
+    }
+}
+
+
+
+
+
+
+
+Question 5:
+Minimum Path Sum
+Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path.
+
+Note: You can only move either down or right at any point in time.
+Example 1:
+Input: grid = [[1,3,1],[1,5,1],[4,2,1]]
+Output: 7
+Explanation: Because the path 1 → 3 → 1 → 1 → 1 minimizes the sum.
+Ans:
+class Solution {
+    public int minPathSum(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        
+        for (int i = 1; i < m; i++) {
+            grid[i][0] += grid[i-1][0];
+        }
+        
+        for (int j = 1; j < n; j++) {
+            grid[0][j] += grid[0][j-1];
+        }
+        
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                grid[i][j] += Math.min(grid[i-1][j], grid[i][j-1]);
+            }
+        }
+        
+        return grid[m-1][n-1];
+    }
+}
+
+Question 6:
+ Triangle
+Given a triangle array, return the minimum path sum from top to bottom.
+For each step, you may move to an adjacent number of the row below. More formally, if you are on index i on the current row, you may move to either index i or index i + 1 on the next row.
+Example 1:
+
+Input: triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]
+Output: 11
+Explanation: The triangle looks like:
+   2
+  3 4
+ 6 5 7
+4 1 8 3
+The minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11 (underlined above).
+class Solution {
+
+    static int dp[][];
+    static int helper(List<List<Integer>> arr, int i, int j){
+        if(i>=arr.size()) return 0;
+
+        if(dp[i][j]!=-1) return dp[i][j];
+        int a=Integer.MAX_VALUE,b=Integer.MAX_VALUE,c=Integer.MAX_VALUE;
+
+        a = arr.get(i).get(j) + helper(arr,i+1,j);
+        b = arr.get(i).get(j) + helper(arr,i+1,j+1);
+
+        return dp[i][j] = Math.min(a,b);
+    }
+    public int minimumTotal(List<List<Integer>> arr) {
+        dp = new int[205][205];
+        for(var a : dp) Arrays.fill(a,-1);
+
+        return helper(arr,0,0);
+    }
+}
+
+Question 7:
+Minimum Falling Path Sum
+Given an n x n array of integers matrix, return the minimum sum of any falling path through matrix.
+
+A falling path starts at any element in the first row and chooses the element in the next row that is either directly below or diagonally left/right. Specifically, the next element from position (row, col) will be (row + 1, col - 1), (row + 1, col), or (row + 1, col + 1).
+Example 1:
+Input: matrix = [[2,1,3],[6,5,4],[7,8,9]]
+Output: 13
+Explanation: There are two falling paths with a minimum sum as shown.
+Ans:
+class Solution {
+    Integer[][] dp;
+    public int minFallingPathSum(int[][] matrix) {
+        int n = matrix.length;
+        dp = new Integer[n][n];
+        
+        int minPathSum = Integer.MAX_VALUE;
+        
+        for(int i = 0; i < n; i++) {
+            minPathSum = Math.min(minPathSum, helper(matrix, 0, i));
+        }
+        
+        return minPathSum;
+    }
+    
+    int helper(int[][] matrix, int i, int j) {
+        int n = matrix.length;
+        
+        
+        if(i == n - 1) {
+            return matrix[i][j];
+        }
+        
+        if(dp[i][j] != null) {
+            return dp[i][j];
+        }
+        
+        int a = Integer.MAX_VALUE, b = Integer.MAX_VALUE, c = Integer.MAX_VALUE;
+        
+        if (j > 0) {
+            a = matrix[i][j] + helper(matrix, i + 1, j - 1);
+        }
+        b = matrix[i][j] + helper(matrix, i + 1, j);
+        if (j < n - 1) {
+            c = matrix[i][j] + helper(matrix, i + 1, j + 1);
+        }
+        
+        return dp[i][j] = Math.min(a, Math.min(b, c));
+    }
+}
+
+Question 8:
+Partition Equal Subset Sum
+Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.
+Example 1:
+Input: nums = [1,5,11,5]
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+Ans:
+
+class Solution {
+
+    static int dp[][];
+
+    boolean helper(int arr[], int i, int k){
+        if(k<0) return false;
+        if(k==0) return true;
+        if(i==arr.length) return false;
+        
+        if(dp[i][k]!=-1){
+            if(dp[i][k]==1) return true;
+            else return false;
+        }
+        boolean a = helper(arr,i+1,k) || helper(arr,i+1,k-arr[i]);
+
+        if(a){
+            dp[i][k] = 1;
+            return true;
+        }else{
+            dp[i][k] = 0;
+            return false;
+        }
+    }
+    public boolean canPartition(int[] arr) {       
+        int n = arr.length;
+
+        int sum = 0;
+        for(int i=0; i<n; i++){
+            sum+=arr[i];
+        }
+
+        if(sum%2!=0) {
+            return false;
+        }
+        else{
+            dp = new int[205][20005];
+            for(var a : dp) Arrays.fill(a,-1);
+            return helper(arr,0,sum/2);
+        }
+    }
+}
+
+Question 9:
+2035. Partition Array Into Two Arrays to Minimize Sum Difference
+You are given an integer array nums of 2 * n integers. You need to partition nums into two arrays of length n to minimize the absolute difference of the sums of the arrays. To partition nums, put each element of nums into one of the two arrays.
+Return the minimum possible absolute difference.
+Example:
+Input: nums = [3,9,7,3]
+Output: 2
+Explanation: One optimal partition is: [3,9] and [7,3].
+The absolute difference between the sums of the arrays is abs((3 + 9) - (7 + 3)) = 2.
+Ans:
+class Solution {
+
+	public int minimumDifference(int[] nums) {
+		int n = nums.length / 2;
+		int total = Arrays.stream(nums).sum();
+		HashMap<Integer,List<Integer>> leftMap = new HashMap();
+		HashMap<Integer,List<Integer>> rightMap = new HashMap();
+
+		createSumMappings(0, leftMap, nums, n);
+		createSumMappings(n, rightMap, nums, n);
+        leftMap.put(0,Arrays.asList(0));
+        rightMap.put(0,Arrays.asList(0));
+
+		int min = Integer.MAX_VALUE;
+		for(int i = 0; i <= n; i++){
+            List<Integer> left = leftMap.get(i);
+            List<Integer> right = rightMap.get(n - i);
+            Collections.sort(left);
+            Collections.sort(right);
+            
+            int p1 = 0, p2 = right.size() - 1;
+            while(p1 < left.size() && p2 >= 0){
+                int sum = left.get(p1) + right.get(p2);
+                int remaining = total - sum;
+                int diff =  Math.abs(remaining - sum);
+                min = Math.min(min,diff);
+                if(sum > total / 2) p2--;
+                else p1++;
+                
+            }
+        }
+		return min;
+	}
+	public void createSumMappings(int offSet, HashMap < Integer, List < Integer >> map, int[] nums, int n) {
+		for (int i = 1; i <= Math.pow(2, n) - 1; i++) {
+			String binary = Integer.toBinaryString(i);
+			int sum = 0,
+			setBits = 0;
+			for (int j = binary.length() - 1, index = nums.length - 1; j >= 0; j--, index--) {
+				if (binary.charAt(j) == '1') {
+					setBits++;
+					sum += nums[index - offSet];
+				}
+			}
+			if (!map.containsKey(setBits)) map.put(setBits, new ArrayList());
+			map.get(setBits).add(sum);
+		}
+	}
+}
+
+Question 10:
+322. Coin Change
+You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+You may assume that you have an infinite number of each kind of coin.
+Example 1:
+Input: coins = [1,2,5], amount = 11
+Output: 3
+Explanation: 11 = 5 + 5 + 1.
+
+Ans:
+class Solution {
+
+    int[] dp;
+    public int coinChange(int[] coins, int amount) {
+
+        dp = new int[amount + 1];
+        Arrays.fill(dp, -1);
+        int ans = coinCount(coins, amount);
+        return (ans == Integer.MAX_VALUE) ?  -1 : ans;
+    }
+
+    int coinCount(int[] coins, int amount) {
+
+        if(amount == 0) {
+            return 0;
+        }
+        if(amount < 0) {
+            return Integer.MAX_VALUE;
+        }
+
+        if(dp[amount] != -1) {
+            return dp[amount];
+        }
+
+        int minCoins = Integer.MAX_VALUE;
+        for(int i = 0; i < coins.length; i++) {
+            int ans = coinCount(coins, amount - coins[i]);
+
+            if(ans != Integer.MAX_VALUE) {
+
+                //we have returned 0 in ans, so now we are updating the ans count
+                //hence 1 + ans
+                minCoins = Math.min(minCoins, 1 + ans);
+            }
+        }
+        return dp[amount] = minCoins;
+    }
+}
+
+
+//tabulation method (bottom-up approach)
+//TC = O(n*amount)
+//SC = O(amount)
+
+class Solution {
+
+    public int coinChange(int[] coins, int amount) {
+
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, Integer.MAX_VALUE);
+        dp[0] = 0;
+        for(int i = 1; i <= amount; i++) {
+            for(int j = 0; j < coins.length; j++) {
+
+                if(i - coins[j] >= 0 && dp[i - coins[j]] != Integer.MAX_VALUE) {
+                    dp[i] = Math.min(dp[i], 1 + dp[i - coins[j]]);
+                }
+            }
+        }
+        return (dp[amount] == Integer.MAX_VALUE) ?  -1 : dp[amount];
+    }
+}
+
+Question 11:
+ Target Sum
+You are given an integer array nums and an integer target.
+You want to build an expression out of nums by adding one of the symbols '+' and '-' before each integer in nums and then concatenate all the integers.
+For example, if nums = [2, 1], you can add a '+' before 2 and a '-' before 1 and concatenate them to build the expression "+2-1".
+Return the number of different expressions that you can build, which evaluates to target.
+Example 1:
+Input: nums = [1,1,1,1,1], target = 3
+Output: 5
+Explanation: There are 5 ways to assign symbols to make the sum of nums be target 3.
+-1 + 1 + 1 + 1 + 1 = 3
++1 - 1 + 1 + 1 + 1 = 3
++1 + 1 - 1 + 1 + 1 = 3
++1 + 1 + 1 - 1 + 1 = 3
++1 + 1 + 1 + 1 - 1 = 3.
+
+Ans:
+public int findTargetSumWays(int[] nums, int s) {
+        int sum = 0;
+        for (int n : nums)
+            sum += n;
+        return sum < s || (s + sum) % 2 > 0 ? 0 : subsetSum(nums, (s + sum) >>> 1); 
+    }   
+
+    public int subsetSum(int[] nums, int s) {
+        int[] dp = new int[s + 1]; 
+        dp[0] = 1;
+        for (int n : nums)
+            for (int i = s; i >= n; i--)
+                dp[i] += dp[i - n]; 
+        return dp[s];
+    } 
+    
+Question 12:
+Coin Change II
+You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+Return the number of combinations that make up that amount. If that amount of money cannot be made up by any combination of the coins, return 0.
+You may assume that you have an infinite number of each kind of coin.
+The answer is guaranteed to fit into a signed 32-bit integer.
+Example 1:
+Input: amount = 5, coins = [1,2,5]
+Output: 4
+Explanation: there are four ways to make up the amount:
+5=5
+5=2+2+1
+5=2+1+1+1
+5=1+1+1+1+1.
+Ans:
+class Solution {
+
+    public int count(int i,int[][] dp,int[] coins,int amount){
+        if(amount==0)
+            return 1;
+        if(i<coins.length){
+        if(dp[i][amount]==-1){
+        if(coins[i]>amount)
+            return 0;
+        return dp[i][amount]=count(i,dp,coins,amount-coins[i])+count(i+1,dp,coins,amount);
+        }
+        return dp[i][amount];
+        }
+        return 0;
+    }
+
+    public int change(int amount, int[] coins) { 
+    int n=coins.length;
+    int[][] dp=new int[n][amount+1];
+    for(int i=0;i<n;i++)
+    Arrays.fill(dp[i],-1);
+    Arrays.sort(coins);
+    return count(0,dp,coins,amount);
+    }
+}
+
+Question 13:
+Longest Common Subsequence
+Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.
+A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.
+For example, "ace" is a subsequence of "abcde".
+A common subsequence of two strings is a subsequence that is common to both strings.
+Example 1:
+Input: text1 = "abcde", text2 = "ace" 
+Output: 3  
+Explanation: The longest common subsequence is "ace" and its length is 3.
+Ans:
+class Solution {
+    public int longestCommonSubsequence(String s1, String s2) {
+        int m=s1.length();
+        int n=s2.length();
+        int dp[][]=new int[m+1][n+1];
+        // dp[0][0]=1;
+        for(int i=1;i<m+1;i++){
+            for(int j=1;j<n+1;j++){
+                if(s1.charAt(i-1)==s2.charAt(j-1)){
+                    dp[i][j]=dp[i-1][j-1]+1;
+                }
+                else{
+                    dp[i][j]=Math.max(dp[i-1][j],dp[i][j-1]);
+
+                }
+            }
+        }
+        return dp[m][n];
+    }
+}
+Question 14:
+ Longest Palindromic Subsequence
+Given a string s, find the longest palindromic subsequence's length in s.
+A subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.
+Example 1:
+Input: s = "bbbab"
+Output: 4
+Explanation: One possible longest palindromic subsequence is "bbbb".
+Ans:
+class Solution {
+      public int helper(String s,int[][] matrix,int i, int j) {
+        if(i==j)
+            return 1;
+        if (i>j)
+            return 0;
+        if(matrix[i][j]!=-1)
+            return matrix[i][j];
+        if(s.charAt(i)==s.charAt(j)) 
+            return matrix[i][j] = helper(s,matrix,i+1,j-1)+2;
+        return matrix[i][j] = Math.max(helper(s,matrix,i+1,j),helper(s,matrix,i,j-1));
+    }
+    public int longestPalindromeSubseq(String s) {
+        int size = s.length();
+        int[][] mat = new int[size][size];
+        for (int[] ints : mat) 
+            Arrays.fill(ints, -1);
+        return helper(s,mat,0,size-1);
+    }
+}
+
+Question 15:
+1312. Minimum Insertion Steps to Make a String Palindrome
+Given a string s. In one step you can insert any character at any index of the string.
+Return the minimum number of steps to make s palindrome.
+A Palindrome String is one that reads the same backward as well as forward.
+Example 1:
+Input: s = "zzazz"
+Output: 0
+Explanation: The string "zzazz" is already palindrome we do not need any insertions.
+Ans:
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        char []str = s.toCharArray();
+        int [][] answ = new int[s.length() + 1][s.length() + 1];
+        int n = s.length();
+        for(int i = 0; i < s.length(); i++)
+        {
+            for (int j = n - 1; j > -1; j--)
+            {
+                if (str[i] == str[j]) answ[i + 1][n - j] = answ[i - 1 + 1][n - j - 1 ] + 1;
+                else answ[i + 1][n - j ] = Math.max(answ[i - 1 + 1][n - j ], answ[i + 1][n - j - 1]);
+            }
+        }
+        return answ[n][n];
+    }
+    public int minInsertions(String s) {
+        return s.length() - longestPalindromeSubseq(s);
+    }
+}
+
+Question 16:
+Delete Operation for Two Strings
+Given two strings word1 and word2, return the minimum number of steps required to make word1 and word2 the same.
+In one step, you can delete exactly one character in either string.
+Example 1:
+Input: word1 = "sea", word2 = "eat"
+Output: 2
+Explanation: You need one step to make "sea" to "ea" and another step to make "eat" to "ea".
+Ans:
+class Solution {
+    public int minDistance(String s1, String s2) {
+        int n = s1.length();
+        int m = s2.length();
+
+        if (n < m) minDistance(s2, s1);
+
+        char[] WA1 = s1.toCharArray();
+        char[] WA2 = s2.toCharArray();
+        
+        int[] dpLast = new int[m + 1];
+        int[] dpCurr = new int[m + 1];
+        
+        for (char c1 : WA1) {
+            for (int j = 0; j < m; j++) {
+                if (c1 == WA2[j]) {
+                    dpCurr[j + 1] = dpLast[j] + 1;
+                } else {
+                    dpCurr[j + 1] = Math.max(dpCurr[j], dpLast[j + 1]);
+                }
+            }
+            int[] tempArr = dpLast;
+            dpLast = dpCurr;
+            dpCurr = tempArr;
+        }
+        
+        return n + m - 2 * dpLast[m];
+    }
+}
+
+Question 17:
+ Shortest Common Supersequence
+Given two strings str1 and str2, return the shortest string that has both str1 and str2 as subsequences. If there are multiple valid strings, return any of them.
+A string s is a subsequence of string t if deleting some number of characters from t (possibly 0) results in the string s.
+Example 1:
+Input: str1 = "abac", str2 = "cab"
+Output: "cabac"
+Explanation: 
+str1 = "abac" is a subsequence of "cabac" because we can delete the first "c".
+str2 = "cab" is a subsequence of "cabac" because we can delete the last "ac".
+The answer provided is the shortest such string that satisfies these properties.
+Ans:
+class Solution {
+
+    static String dp[][];
+
+    static String LCS(String s1, String s2, int i, int j){  
+
+        if(i>=s1.length() || j>=s2.length()){
+            return "";
+        }
+
+        if(dp[i][j]!="") return dp[i][j];
+        char ch1 = s1.charAt(i);
+        char ch2 = s2.charAt(j);
+
+        if(ch1==ch2){
+            return dp[i][j] = ch1+LCS(s1,s2,i+1,j+1);
+        }else{
+            String a = LCS(s1,s2,i+1,j);
+            String b =  LCS(s1,s2,i,j+1);
+
+            return dp[i][j] = (a.length()>b.length()) ? a:b;
+        }
+    }
+
+    public String shortestCommonSupersequence(String str1, String str2) {
+        dp = new String[1005][1005];
+
+        for(int i=0; i<1005; i++){
+            for(int j=0; j<1005; j++) dp[i][j] = "";
+        }
+
+        String s = LCS(str1,str2,0,0);
+
+        String ans = "";
+
+        int i=0,j=0;
+    
+        for(int k=0; k<s.length(); k++){
+
+            char c = s.charAt(k);
+
+            while(str1.charAt(i)!=c) ans+=str1.charAt(i++);
+            while(str2.charAt(j)!=c) ans+=str2.charAt(j++);
+
+            ans += c;
+            i++;
+            j++;    
+        }
+
+         return ans+str1.substring(i)+str2.substring(j);
+    }
+}
+
+Question 18:
+Distinct Subsequences
+Given two strings s and t, return the number of distinct subsequences of s which equals t.
+The test cases are generated so that the answer fits on a 32-bit signed integer.
+Example 1:
+Input: s = "rabbbit", t = "rabbit"
+Output: 3
+Explanation:
+As shown below, there are 3 ways you can generate "rabbit" from s.
+rabbbit
+rabbbit
+rabbbit
+
+Ans:
+public int numDistinct(String S, String T) {
+    // array creation
+    int[][] mem = new int[T.length()+1][S.length()+1];
+
+    // filling the first row: with 1s
+    for(int j=0; j<=S.length(); j++) {
+        mem[0][j] = 1;
+    }
+    
+    // the first column is 0 by default in every other rows but the first, which we need.
+    
+    for(int i=0; i<T.length(); i++) {
+        for(int j=0; j<S.length(); j++) {
+            if(T.charAt(i) == S.charAt(j)) {
+                mem[i+1][j+1] = mem[i][j] + mem[i+1][j];
+            } else {
+                mem[i+1][j+1] = mem[i+1][j];
+            }
+        }
+    }
+    
+    return mem[T.length()][S.length()];
+}
+
+Question 19:
+Edit Distance
+Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.
+You have the following three operations permitted on a word:
+Insert a character
+Delete a character
+Replace a character
+Example 1:
+Input: word1 = "horse", word2 = "ros"
+Output: 3
+Explanation: 
+horse -> rorse (replace 'h' with 'r')
+rorse -> rose (remove 'r')
+rose -> ros (remove 'e')
+Ans:
+class Solution {
+  public int minDistance(String word1, String word2) {
+    final int m = word1.length();//first word length
+    final int n = word2.length();///second word length
+    // dp[i][j] := min # of operations to convert word1[0..i) to word2[0..j)
+    int[][] dp = new int[m + 1][n + 1];
+
+    for (int i = 1; i <= m; ++i)
+      dp[i][0] = i;
+
+    for (int j = 1; j <= n; ++j)
+      dp[0][j] = j;
+
+    for (int i = 1; i <= m; ++i)
+      for (int j = 1; j <= n; ++j)
+        if (word1.charAt(i - 1) == word2.charAt(j - 1))//same characters
+          dp[i][j] = dp[i - 1][j - 1];//no operation
+        else
+          dp[i][j] = Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1])) + 1;                      //replace               //delete        //insert
+
+    return dp[m][n];
+  }
+}
+
+Question 20:
+Wildcard Matching
+Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*' where:
+'?' Matches any single character.
+'*' Matches any sequence of characters (including the empty sequence).
+The matching should cover the entire input string (not partial).
+Example 1:
+Input: s = "aa", p = "a"
+Output: false
+Explanation: "a" does not match the entire string "aa".
+Ans:
+class Solution {
+    public boolean isMatch(String s, String p) {
+        dp = new int[s.length()][p.length()];
+        return helper(s, p, 0, 0);
+    }
+
+    int[][] dp;
+    
+    private boolean helper(String s, String p, int iS, int iP) {
+        // base case one: retrun true if we match all chars to the end
+        if((iS == s.length() && iP == p.length()) 
+        || (iS == s.length() && isRestAllAsterisk(p, iP))) {
+            return true;
+        }
+        // base case two: return false if only one of them make it to the end
+        if(iS >= s.length() || iP >= p.length()) {
+            return false;
+        }
+        // base case three: return false if current p is not '?' or '*' and is nat a matched char to s
+        if(p.charAt(iP) != '?' && p.charAt(iP) != '*' && s.charAt(iS) != p.charAt(iP)) {
+            return false;
+        }
+        // if we already have an answer, just return the answer
+        if(dp[iS][iP] != 0) {
+            return dp[iS][iP] == 1;
+        }
+        boolean res = false;
+        switch(p.charAt(iP)) {
+            case '?':
+                // have to match one char
+                res = res || helper(s, p, iS + 1, iP + 1);
+                break;
+            case '*':
+                // tricky part
+                // we can either match multiple chars or nothing
+                res = res || helper(s, p, iS, iP + 1); // match nothing
+                res = res || helper(s, p, iS + 1, iP + 1); // match one char
+                res = res || helper(s, p, iS + 1, iP); // match one char with no cost
+                break;
+            default:
+                // same char, have to match one char
+                res = res || helper(s, p, iS + 1, iP + 1);
+        }
+        // memorize answer for later use
+        dp[iS][iP] = res ? 1 : -1;
+        return res;
+    }
+
+    private boolean isRestAllAsterisk(String p, int iP) {
+        for(int i = iP ; i < p.length() ; i++) {
+            if(p.charAt(i) != '*') {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+Question 21:
+Best Time to Buy and Sell Stock
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+Example 1:
+Input: prices = [7,1,5,3,6,4]
+Output: 5
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+Ans:
+class Solution {
+    public int maxProfit(int[] prices) {
+        int lsf = Integer.MAX_VALUE;
+        int op = 0;
+        int pist = 0;
+        
+        for(int i = 0; i < prices.length; i++){
+            if(prices[i] < lsf){
+                lsf = prices[i];
+            }
+            pist = prices[i] - lsf;
+            if(op < pist){
+                op = pist;
+            }
+        }
+        return op;
+    }
+}
+
+Question 22:
+Best Time to Buy and Sell Stock II
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day.
+On each day, you may decide to buy and/or sell the stock. You can only hold at most one share of the stock at any time. However, you can buy it then immediately sell it on the same day.
+Find and return the maximum profit you can achieve.
+Example 1:
+Input: prices = [7,1,5,3,6,4]
+Output: 7
+Explanation: Buy on day 2 (price = 1) and sell on day 3 (price = 5), profit = 5-1 = 4.
+Then buy on day 4 (price = 3) and sell on day 5 (price = 6), profit = 6-3 = 3.
+Total profit is 4 + 3 = 7.
+ Ans:
+ class Solution {
+    public int maxProfit(int[] prices) {
+        int profit = 0;
+        for(int i=1;i<prices.length;i++) {
+            if(prices[i] > prices[i-1]) {
+                profit += prices[i] - prices[i-1];
+            }
+        }
+        return profit;
+    }
+}
+
+Question 23:
+Best Time to Buy and Sell Stock III
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+Find the maximum profit you can achieve. You may complete at most two transactions.
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+Example 1:
+Input: prices = [3,3,5,0,0,3,1,4]
+Output: 6
+Explanation: Buy on day 4 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+Then buy on day 7 (price = 1) and sell on day 8 (price = 4), profit = 4-1 = 3.
+
+Ans:
+class Solution {
+
+    static int dp[][][];
+    static int helper(int arr[], int i, int k, int flag){
+        if(i==arr.length) return 0;
+
+        if(dp[flag][k][i]!=-1) return dp[flag][k][i];
+
+        int ans = Integer.MIN_VALUE;
+        ans = helper(arr,i+1,k,flag);   // leave thar stock
+
+        if(flag==1){
+            ans = Math.max(ans, helper(arr,i+1,k-1,0)+arr[i]);  // sell
+        }else{
+            if(k>0) ans = Math.max(ans,helper(arr,i+1,k,1)-arr[i]);  // buy
+        }
+        return  dp[flag][k][i] = ans;
+    }
+    public int maxProfit(int[] arr) {
+        dp = new int[2][3][100005];
+        for(var a : dp){
+            for(var b : a) Arrays.fill(b,-1);
+        }
+        
+        return helper(arr,0,2,0);
+    }
+}
+
+Question 24:
+Best Time to Buy and Sell Stock IV
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day, and an integer k.
+Find the maximum profit you can achieve. You may complete at most k transactions: i.e. you may buy at most k times and sell at most k times.
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+Example 1:
+Input: k = 2, prices = [2,4,1]
+Output: 2
+Explanation: Buy on day 1 (price = 2) and sell on day 2 (price = 4), profit = 4-2 = 2.
+Ans:
+class Solution {
+    static int solveTab(int[] prices,int k){
+        int n=prices.length;
+
+        int [][] curr = new int[2][k+2];
+        int [][] next = new int[2][k+2];
+
+        for(int index=n-1;index>=0;index--){
+            for(int buy=1;buy>=0;buy--){
+                for(int limit=1;limit<=k;limit++){
+                    int profit=0;
+                    if(buy==1){
+                        int salekaro=prices[index]+next[0][limit-1];
+                        int skipkaro=0+next[1][limit];
+                        profit+=Math.max(salekaro,skipkaro);
+                    }
+                    else{
+                        int buykaro=-prices[index]+next[1][limit];
+                        int skipkaro=0+next[0][limit];
+                        profit+=Math.max(buykaro,skipkaro);
+                    }
+                    curr[buy][limit]=profit;
+                }
+            }
+            next=curr;
+        }
+        return next[0][k];
+    }
+    public int maxProfit(int k, int[] prices) {
+        return solveTab(prices,k);
+    }
+}
+
+Question 25:
+Best Time to Buy and Sell Stock with Cooldown
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+Find the maximum profit you can achieve. You may complete as many transactions as you like (i.e., buy one and sell one share of the stock multiple times) with the following restrictions:
+After you sell your stock, you cannot buy stock on the next day (i.e., cooldown one day).
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+Example 1:
+Input: prices = [1,2,3,0,2]
+Output: 3
+Explanation: transactions = [buy, sell, cooldown, buy, sell]
+Ans:
+class Solution {
+    public static int ans(int a[],int n,int b,int dp[][]){
+        if(n>=a.length) return 0;
+        if(dp[n][b]!=-1) return dp[n][b];
+        //int p=0,q=0;
+        if(b==0){ 
+            return dp[n][b]=Math.max(ans(a,n+2,1,dp)+a[n],ans(a,n+1,0,dp));
+        }
+        else {
+            return dp[n][b]=Math.max(ans(a,n+1,0,dp)-a[n],ans(a,n+1,1,dp));
+        }
+    }
+    public int maxProfit(int[] prices) {
+        int dp[][]=new int[prices.length][2];
+        for(int i=0;i<prices.length;i++){
+            for(int j=0;j<2;j++) dp[i][j]=-1;
+        }
+        return ans(prices,0,1,dp);
+    }
+}
+Question 26:
+Best Time to Buy and Sell Stock with Transaction Fee
+You are given an array prices where prices[i] is the price of a given stock on the ith day, and an integer fee representing a transaction fee.
+Find the maximum profit you can achieve. You may complete as many transactions as you like, but you need to pay the transaction fee for each transaction.
+Note:
+You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+The transaction fee is only charged once for each stock purchase and sale.
+Example 1:
+Input: prices = [1,3,2,8,4,9], fee = 2
+Output: 8
+Explanation: The maximum profit can be achieved by:
+- Buying at prices[0] = 1
+- Selling at prices[3] = 8
+- Buying at prices[4] = 4
+- Selling at prices[5] = 9
+The total profit is ((8 - 1) - 2) + ((9 - 4) - 2) = 8.
+Ans:
+class Solution {
+    public int maxProfit(int[] prices, int fee) {
+        int buy = Integer.MIN_VALUE;
+        int sell = 0;
+
+        for (int price : prices) {
+            buy = Math.max(buy, sell - price);
+            sell = Math.max(sell, buy + price - fee);
+        }
+
+        return sell;
+    }
+}
+
+Question 27:
+ Longest Increasing Subsequence
+Given an integer array nums, return the length of the longest strictly increasing 
+subsequence
+Example 1:
+Input: nums = [10,9,2,5,3,7,101,18]
+Output: 4
+Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+Ans:
+public int lengthOfLIS(int[] nums) {
+    int[] tails = new int[nums.length];
+    int size = 0;
+    for (int x : nums) {
+        int i = 0, j = size;
+        while (i != j) {
+            int m = (i + j) / 2;
+            if (tails[m] < x)
+                i = m + 1;
+            else
+                j = m;
+        }
+        tails[i] = x;
+        if (i == size) ++size;
+    }
+    return size;
+}
+
+Question 28:
+Largest Divisible Subset
+Given a set of distinct positive integers nums, return the largest subset answer such that every pair (answer[i], answer[j]) of elements in this subset satisfies:
+answer[i] % answer[j] == 0, or
+answer[j] % answer[i] == 0
+If there are multiple solutions, return any of them.
+Example 1:
+Input: nums = [1,2,3]
+Output: [1,2]
+Explanation: [1,3] is also accepted.
+Ans:
+class Solution {
+  // if we sort the array, every element in a divisibleSubset can be divisible by the element just before it.
+// for any element k, its largestDivisibleSubset that ends with k can be formed in the following way: 
+// use element k after any one of the previous elements that is divisble 
+public List<Integer> largestDivisibleSubset(int[] nums) {
+    int[] l = new int[nums.length]; // the length of largestDivisibleSubset that ends with element i
+    int[] prev = new int[nums.length]; // the previous index of element i in the largestDivisibleSubset ends with element i
+    
+    Arrays.sort(nums);
+    
+    int max = 0;
+    int index = -1;
+    for (int i = 0; i < nums.length; i++){
+        l[i] = 1;
+        prev[i] = -1;
+        for (int j = i - 1; j >= 0; j--){
+            if (nums[i] % nums[j] == 0 && l[j] + 1 > l[i]){
+                l[i] = l[j] + 1;
+                prev[i] = j;
+            }
+        }
+        if (l[i] > max){
+            max = l[i];
+            index = i;
+        }
+    }
+    List<Integer> res = new ArrayList<Integer>();
+    while (index != -1){
+        res.add(nums[index]);
+        index = prev[index];
+    }
+    return res;
+}
+
+}
+
+Question 29:
+ Longest String Chain
+You are given an array of words where each word consists of lowercase English letters.
+wordA is a predecessor of wordB if and only if we can insert exactly one letter anywhere in wordA without changing the order of the other characters to make it equal to wordB.
+For example, "abc" is a predecessor of "abac", while "cba" is not a predecessor of "bcad".
+A word chain is a sequence of words [word1, word2, ..., wordk] with k >= 1, where word1 is a predecessor of word2, word2 is a predecessor of word3, and so on. A single word is trivially a word chain with k == 1.
+Return the length of the longest possible word chain with words chosen from the given list of words.
+Example 1:
+Input: words = ["a","b","ba","bca","bda","bdca"]
+Output: 4
+Explanation: One of the longest word chains is ["a","ba","bda","bdca"].
+Ans:
+class Solution {
+    public static int longestStrChain(String[] words)
+    {
+       Arrays.sort(words, (a, b) -> a.length() - b.length());
+        HashMap<String, Integer> dp = new HashMap<>();
+
+        int maxChain = 1;
+        
+        for (String word : words) {
+            int best = 0;
+            for (int i = 0; i < word.length(); ++i) {
+                StringBuilder temp = new StringBuilder(word);
+                String prev = temp.deleteCharAt(i).toString();
+                best = Math.max(best, dp.getOrDefault(prev, 0) + 1);
+            }
+            dp.put(word, best);
+            maxChain = Math.max(maxChain, best);
+        }
+        
+        return maxChain;
+    }
+}
+
+Question 30:
+Number of Longest Increasing Subsequence
+Given an integer array nums, return the number of longest increasing subsequences.
+Notice that the sequence has to be strictly increasing.
+Example 1:
+Input: nums = [1,3,5,4,7]
+Output: 2
+Explanation: The two longest increasing subsequences are [1, 3, 4, 7] and [1, 3, 5, 7].
+Ans:
+class Solution {
+    public int findNumberOfLIS(int[] nums) {
+        int n = nums.length;
+        int [] dp = new int[n];
+        int [] count = new int[n];
+        Arrays.fill(dp, 1);
+        Arrays.fill(count,1);
+        int max = 1;
+        
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                        if (dp[j] + 1 > dp[i]) {
+                            dp[i] = dp[j] + 1;
+                            count[i] = count[j];
+                        } else if (dp[j] + 1 == dp[i]) {
+                            count[i] += count[j];
+                        }
+                max = Math.max(dp[i],max);
+                }
+            }
+        }
+        int ans = 0;
+        for (int i = 0; i < n; i++) {
+            if (dp[i] == max) {
+                ans += count[i];
+            }
+        }
+        return ans;
+        
+    }
+}
+
+Question 31:
+Minimum Cost to Cut a Stick
+Given a wooden stick of length n units. The stick is labelled from 0 to n. For example, a stick of length 6 is labelled as follows:
+Given an integer array cuts where cuts[i] denotes a position you should perform a cut at.
+You should perform the cuts in order, you can change the order of the cuts as you wish.
+The cost of one cut is the length of the stick to be cut, the total cost is the sum of costs of all cuts. When you cut a stick, it will be split into two smaller sticks (i.e. the sum of their lengths is the length of the stick before the cut). Please refer to the first example for a better explanation.
+Return the minimum total cost of the cuts.
+Example 1:
+Input: n = 7, cuts = [1,3,4,5]
+Output: 16
+Explanation: Using cuts order = [1, 3, 4, 5] as in the input leads to the following scenario:
+Ans:
+class Solution {
+    public int minCost(int n, int[] cuts) {
+        int[] newCuts = new int[cuts.length + 2];
+        newCuts[0] = 0;
+        newCuts[newCuts.length - 1] = n;
+        System.arraycopy(cuts, 0, newCuts, 1, cuts.length);
+        Arrays.sort(newCuts);
+        
+        int[][] dp = new int[newCuts.length][newCuts.length];
+        for (int len = 2; len < newCuts.length; len++) {
+            for (int i = 0; i + len < newCuts.length; i++) {
+                int j = i + len;
+                dp[i][j] = Integer.MAX_VALUE;
+                for (int k = i + 1; k < j; k++) {
+                    dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k][j] + newCuts[j] - newCuts[i]);
+                }
+            }
+        }
+        
+        return dp[0][newCuts.length - 1];
+    }
+}
+
+Question 32:
+ Burst Balloons
+You are given n balloons, indexed from 0 to n - 1. Each balloon is painted with a number on it represented by an array nums. You are asked to burst all the balloons.
+If you burst the ith balloon, you will get nums[i - 1] * nums[i] * nums[i + 1] coins. If i - 1 or i + 1 goes out of bounds of the array, then treat it as if there is a balloon with a 1 painted on it.
+Return the maximum coins you can collect by bursting the balloons wisely.
+Example 1:
+Input: nums = [3,1,5,8]
+Output: 167
+Explanation:
+nums = [3,1,5,8] --> [3,5,8] --> [3,8] --> [8] --> []
+coins =  3*1*5    +   3*5*8   +  1*3*8  + 1*8*1 = 167
+Ans:
+public int maxCoins(int[] iNums) {
+    int[] nums = new int[iNums.length + 2];
+    int n = 1;
+    for (int x : iNums) if (x > 0) nums[n++] = x;
+    nums[0] = nums[n++] = 1;
+
+
+    int[][] memo = new int[n][n];
+    return burst(memo, nums, 0, n - 1);
+}
+
+public int burst(int[][] memo, int[] nums, int left, int right) {
+    if (left + 1 == right) return 0;
+    if (memo[left][right] > 0) return memo[left][right];
+    int ans = 0;
+    for (int i = left + 1; i < right; ++i)
+        ans = Math.max(ans, nums[left] * nums[i] * nums[right] 
+        + burst(memo, nums, left, i) + burst(memo, nums, i, right));
+    memo[left][right] = ans;
+    return ans;
+}
+// 12 ms
+
+Question 33:
+Parsing A Boolean Expression
+A boolean expression is an expression that evaluates to either true or false. It can be in one of the following shapes:
+'t' that evaluates to true.
+'f' that evaluates to false.
+'!(subExpr)' that evaluates to the logical NOT of the inner expression subExpr.
+'&(subExpr1, subExpr2, ..., subExprn)' that evaluates to the logical AND of the inner expressions subExpr1, subExpr2, ..., subExprn where n >= 1.
+'|(subExpr1, subExpr2, ..., subExprn)' that evaluates to the logical OR of the inner expressions subExpr1, subExpr2, ..., subExprn where n >= 1.
+Given a string expression that represents a boolean expression, return the evaluation of that expression.
+It is guaranteed that the given expression is valid and follows the given rules.
+Example 1:
+Input: expression = "&(|(f))"
+Output: false
+Explanation: 
+First, evaluate |(f) --> f. The expression is now "&(f)".
+Then, evaluate &(f) --> f. The expression is now "f".
+Finally, return false.
+Ans:
+    public boolean parseBoolExpr(String expression) {
+        Deque<Character> stk = new ArrayDeque<>();
+        for (int i = 0; i < expression.length(); ++i) {
+            char c = expression.charAt(i);
+            if (c == ')') {
+                Set<Character> seen = new HashSet<>();
+                while (stk.peek() != '(')
+                    seen.add(stk.pop());
+                stk.pop();// pop out '('.
+                char operator = stk.pop(); // get operator for current expression.
+                if (operator == '&') {
+                    stk.push(seen.contains('f') ? 'f' : 't'); // if there is any 'f', & expression results to 'f'
+                }else if (operator == '|') {
+                    stk.push(seen.contains('t') ? 't' : 'f'); // if there is any 't', | expression results to 't'
+                }else { // ! expression.
+                    stk.push(seen.contains('t') ? 'f' : 't'); // Logical NOT flips the expression.
+                }
+            }else if (c != ',') {
+                stk.push(c);
+            }
+        }
+        return stk.pop() == 't';
+    }
+    
+ Question 34:
+ Palindrome Partitioning II
+Given a string s, partition s such that every  substring of the partition is a  palindrome
+Return the minimum cuts needed for a palindrome partitioning of s.
+Example 1:
+Input: s = "aab"
+Output: 1
+Explanation: The palindrome partitioning ["aa","b"] could be produced using 1 cut.
+Ans:
+class Solution {
+    private static boolean isPalindrome(int i, int j, String s){
+        while(i<j){
+            if(s.charAt(i)!=s.charAt(j)) return false;
+            i++;
+            j--;
+        }
+        return true;
+    }
+
+    private static int fun(int cut, String s, int[] dp){
+        // Base Case 
+        if(cut==s.length()) return 0;
+        
+        // Code 
+        if(dp[cut]!=-1) return dp[cut];
+        int minCuts = Integer.MAX_VALUE;
+        for(int partition=cut;partition<s.length();partition++){
+            if(isPalindrome(cut,partition,s)){
+                int cuts = 1 + fun(partition+1,s,dp);
+                minCuts = Math.min(minCuts,cuts);
+            }
+        }
+        return dp[cut] = minCuts;
+    }
+
+    public int minCut(String s){
+        int[] dp = new int[s.length()];
+        Arrays.fill(dp,-1);
+        return fun(0,s,dp)-1;
+    }
+}
+// Memoization Code 
+// Time Complexity : ~ O(n*n*n), Linear Complexity
+// Space Complexity : O(n + n)
+
+
+Question 36:
+Partition Array for Maximum Sum
+Given an integer array arr, partition the array into (contiguous) subarrays of length at most k. After partitioning, each subarray has their values changed to become the maximum value of that subarray.
+Return the largest sum of the given array after partitioning. Test cases are generated so that the answer fits in a 32-bit integer.
+Example 1:
+Input: arr = [1,15,7,9,2,5,10], k = 3
+Output: 84
+Explanation: arr becomes [15,15,15,9,10,10,10]
+Ans:
+    public int maxSumAfterPartitioning(int[] A, int K) {
+        int N = A.length, dp[] = new int[N + 1];
+        for (int i = 1; i <= N; ++i) {
+            int curMax = 0, best = 0;
+            for (int k = 1; k <= K && i - k >= 0; ++k) {
+                curMax = Math.max(curMax, A[i - k]);
+                best = Math.max(best, dp[i - k] + curMax * k);
+            }
+            dp[i] = best;
+        }
+        return dp[N];
+    }
+    
+    
+Question 37:
+Maximal Rectangle
+Given a rows x cols binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
+
+Example:
+Input: matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+Output: 6
+Explanation: The maximal rectangle is shown in the above picture.
+Ans:
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+
+        int max = 0;
+
+        int m = matrix.length;
+        int n = matrix[0].length;
+
+        int arr[] = new int[n];
+
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(matrix[i][j] == '0'){
+                    arr[j] = 0;
+                } else {
+                    arr[j] += 1;
+                }
+            }
+
+            max = Math.max(max, helper(arr));
+        }
+
+        return max;
+    }
+
+    public int helper(int[] arr){
+        Deque<Pair<Integer, Integer>> st = new ArrayDeque<>();
+
+        int max = 0;
+
+        for(int i = 0; i < arr.length; i++){
+            int idx = i;
+
+            while(st.size() > 0 && st.peek().getKey() >= arr[i]){
+                Pair<Integer, Integer> p = st.pop();
+
+                idx = p.getValue();
+
+                int area = p.getKey()*(i - idx);
+
+                max = Math.max(max, area);
+            }
+
+            st.push(new Pair<>(arr[i], idx));
+        }
+
+        while(st.size() > 0){
+            Pair<Integer, Integer> p = st.pop();
+
+            int area = p.getKey()*(arr.length - p.getValue());
+
+            max = Math.max(max, area);
+        }
+
+        return max;
+    }
+}
+
+Question 38:
+Count Square Submatrices with All Ones
+Given a m * n matrix of ones and zeros, return how many square submatrices have all ones.
+Example 1:
+Input: matrix =
+[
+  [0,1,1,1],
+  [1,1,1,1],
+  [0,1,1,1]
+]
+Output: 15
+Explanation: 
+There are 10 squares of side 1.
+There are 4 squares of side 2.
+There is  1 square of side 3.
+Total number of squares = 10 + 4 + 1 = 15.
+Ans:
+class Solution {
+    public int countSquares(int[][] mat) {
+        int count = 0;
+
+        for(int row = 0; row < mat.length; row++){
+            for(int col = 0; col < mat[0].length; col++){
+                if(mat[row][col] == 1){
+                    int min = Integer.MAX_VALUE;
+
+                    if(col - 1 >= 0)
+                        min = Math.min(mat[row][col - 1], min);
+                    else min = 0;
+                    
+                    if(row - 1 >= 0)
+                        min = Math.min(mat[row - 1][col], min);
+                    else min = 0;
+
+                    if(row - 1 >= 0 && col - 1 >= 0)
+                        min = Math.min(min, mat[row - 1][col - 1]);
+                    else min = 0;
+                    
+                    mat[row][col] += min;
+                    count += mat[row][col];
+                }
+            }
+        }
+
+        return count;
+    }
+}
+
+Question 39:
+Best Team With No Conflicts
+You are the manager of a basketball team. For the upcoming tournament, you want to choose the team with the highest overall score. The score of the team is the sum of scores of all the players in the team.
+However, the basketball team is not allowed to have conflicts. A conflict exists if a younger player has a strictly higher score than an older player. A conflict does not occur between players of the same age.
+Given two lists, scores and ages, where each scores[i] and ages[i] represents the score and age of the ith player, respectively, return the highest overall score of all possible basketball teams.
+Example 1:
+Input: scores = [1,3,5,10,15], ages = [1,2,3,4,5]
+Output: 34
+Explanation: You can choose all the players.
+Ans:
+
+//Create a model for player
+public class Player{
+    public int score;
+    public int age;
+}
+
+public class Solution {
+    //Initialise the list for storing both score and ages as single item
+    public List<Player> teamList=new List<Player>();
+    public int BestTeamScore(int[] scores, int[] ages) {
+        int length=ages.Length;
+        int result=0;
+        //Initialise the without conflict scored list of players array
+        int [] dp=new int[length];
+        for(int i=0;i<length;i++){
+            var item=new Player{score=scores[i],age=ages[i]};
+            teamList.Add(item);
+        }
+        //Sort by ascending order the List by age and then by score 
+        teamList=teamList.OrderBy(team=>team.age).ThenBy(team=>team.score).ToList();
+        for(int i=0;i<length;i++){
+            dp[i] = teamList[i].score;
+            for(int j = 0; j < i; j++) {
+                if(teamList[j].age==teamList[i].age){
+                    dp[i]=Math.Max(dp[i],dp[j]+teamList[i].score);
+                }
+                else if(teamList[j].score <= teamList[i].score && teamList[j].age<teamList[i].age)
+                    dp[i] = Math.Max(dp[i], dp[j] + teamList[i].score);
+            }
+            result = Math.Max(result, dp[i]);
+        }
+        return result;;
+    }
+}
+
+Question 40:
+Find maximum number of people who can attend meeting
+There is only one room which is holding N meetings that are given as intervals of the form (start[i], end[i], people[i]) where start[i] is the starting time of the ith meeting, end[i] is the ending time of the ith meeting, people[i] is the number of people who can attend the ith meeting. At any point of time, the room can be occupied by only one meeting i.e., If two meetings have overlapping intervals then only one of them can be picked. The task is to find the maximum number of people who can attend the meeting.
+Examples:
+Input: Meetings = { {5, 8, 3}, {1, 4, 5}, {7, 10, 2} }
+Outputs: 8
+Explanation: The optimal meetings are {1, 4, 5} and {5, 8, 3}.
+So, 5+3 = 8 is the maximum number of people.
+Ans:
+/*package whatever //do not write package name here */
+import java.io.*;
+import java.util.*;
+
+// sorting a list of list
+class ListComparator<T extends Comparable<T> >
+implements Comparator<List<T> > {
+
+@Override public int compare(List<T> o1, List<T> o2)
+{
+	for (int i = 0; i < Math.min(o1.size(), o2.size());
+		i++) {
+	int c = o1.get(i).compareTo(o2.get(i));
+	if (c != 0) {
+		return c;
+	}
+	}
+	return Integer.compare(o1.size(), o2.size());
+}
+}
+
+class GFG {
+
+// Function to find the maximum number of people
+public static int maxPeople(List<List<Integer> > data,
+							int n)
+{
+	// Sorting the intervals according to
+	// the end time in non decreasing order
+	Collections.sort(data, new ListComparator<>());
+
+	List<Integer> dp = new ArrayList<Integer>();
+	for (int i = 0; i < n; i++) {
+	dp.add(0);
+	}
+	dp.set(0, data.get(0).get(2));
+
+	// Need a map to store the highest possible value
+	// for same end timed intervals
+
+	Map<Integer, Integer> mp
+	= new HashMap<Integer, Integer>();
+
+	for (int i = 0; i < 15; i++) {
+	mp.put(i, 0);
+	}
+
+	// First interval is assumed to be taken at first
+	// the highest value with its ending time is dp[0]
+	mp.put(data.get(0).get(1), dp.get(0));
+	for (int i = 1; i < n; i++) {
+	int curstart = data.get(i).get(0);
+	int curend = data.get(i).get(1);
+
+	// If the ith interval overlaps with
+	// the (i-1)th interval
+	if (curstart <= data.get(i - 1).get(1)) {
+
+		// Binary search for an interval that has
+		// its ending time just lesser than
+		// the starting time of the ith interval
+		int left = 0;
+		int right = i;
+		int var = data.get(i).get(0);
+		while (left < right) {
+		int mid = left + (right - left) / 2;
+		if (data.get(mid).get(1) < var)
+			left = mid;
+		else
+			right = mid - 1;
+		}
+		// We have two choice either we don't pick
+		// the ith interval then dp[i-1] or we pick
+		// the ith interval then dp[left]+ith value.
+		// We use mp[data[left][1]] instead of
+		// dp[left] since our map stores the maximum
+		// of the dp values that end with a given
+		// end time.
+		dp.set(i, Math.max(
+		dp.get(i - 1),
+		mp.get(data.get(left).get(1))
+		+ data.get(i).get(2)));
+
+		// Update the map with max of current dp
+		// value and mp[data[i][1]] accounting for
+		// an interval that may have higher dp value
+		// ending with the same end time as the ith
+		// interval.
+		mp.put(
+		data.get(i).get(1),
+		Math.max(dp.get(i),
+				mp.get(data.get(i).get(1))));
+	}
+	else {
+		dp.set(i,
+			dp.get(i - 1) + data.get(i).get(2));
+		mp.put(data.get(i).get(1),
+			Math.max(mp.get(data.get(i).get(1)),
+						dp.get(i)));
+	}
+	}
+
+	// Return the required answer
+	return dp.get(n - 1);
+}
+
+public static void main(String[] args)
+{
+	List<List<Integer> > Meetings = new ArrayList<>();
+
+	List<Integer> a = new ArrayList<Integer>();
+	a.add(5);
+	a.add(8);
+	a.add(3);
+	Meetings.add(a);
+
+	List<Integer> b = new ArrayList<Integer>();
+	b.add(1);
+	b.add(4);
+	b.add(5);
+	Meetings.add(b);
+
+	List<Integer> c = new ArrayList<Integer>();
+	c.add(7);
+	c.add(10);
+	c.add(2);
+	Meetings.add(c);
+
+	int N = Meetings.size();
+
+	// Function call
+	System.out.println(maxPeople(Meetings, N));
+}
+}
+
+// This code is contributed by akashish__
+
+Question 41:
+Printing Longest Increasing Subsequence
+Given an integer n and array of integers, returns the Longest Increasing subsequence which is lexicographically smallest corresponding to the indices of the elements.
+LIS  of a given sequence such that all elements of the subsequence are sorted in increasing order. For example, the length of LIS for {10, 22, 9, 33, 21, 50, 41, 60, 80} is 6 and LIS is {10, 22, 33, 50, 60, 80}. 
+ Note - A subsequence S1 is lexicographically smaller than a subsequence S2 if in the first position where a and b differ, subsequence a has a letter that appears earlier in the array than the corresponding letter in b.
+Example 1:
+
+Input:
+n = 16
+arr = [0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15]
+Output:
+0 4 6 9 13 15 
+Explanation:
+longest Increasing subsequence is 0 4 6 9 13 15  and the length of the longest increasing subsequence is 6.
+
+Ans:
+
+class Solution{
+    public ArrayList<Integer> longestIncreasingSubsequence(int N, int arr[]){
+        
+        
+        int[] dp=new int[N];
+        int[] hash=new int[N];
+        
+        for(int i=0;i<N;i++){
+            dp[i]=1;
+            hash[i]=i;
+        }
+        
+        int lastIndex=0;
+        int max=1;
+        for(int i=1;i<N;i++){
+            for(int j=0;j<i;j++){
+                if(arr[j]<arr[i]&&dp[j]+1>dp[i]){
+                    dp[i]=dp[j]+1;
+                    hash[i]=j;
+                }
+            }
+            if(dp[i]>max){
+                max=dp[i];
+                lastIndex=i;
+            }
+        }
+        
+        //System.out.println(lastIndex);
+        
+        ArrayList<Integer> list=new ArrayList<>();
+        list.add(arr[lastIndex]);
+        
+        while(hash[lastIndex]!=lastIndex){
+            list.add(arr[hash[lastIndex]]);
+            lastIndex=hash[lastIndex];
+        }
+        
+        Collections.reverse(list);
+        
+        return list;
+        
+    }
+}
+
+Question 42:
+Longest Bitonic subsequence
+Given an array of positive integers. Find the maximum length of Bitonic subsequence. 
+A subsequence of array is called Bitonic if it is first strictly increasing, then strictly decreasing.
+Example 1:
+
+Input: nums = [1, 2, 5, 3, 2]
+Output: 5
+Explanation: The sequence {1, 2, 5} is
+increasing and the sequence {3, 2} is 
+decreasing so merging both we will get 
+length 5.
+Ans:
+class Solution
+{
+    public int LongestBitonicSequence(int[] nums)
+    {
+        // Code here
+        int n=nums.length;
+        
+        int []dp1=new int[n];
+        int []dp2=new int[n];
+        
+        dp1[0]=1;
+        
+        for(int i=1;i<n;i++){
+            int max=0;
+            
+            for(int j=i-1;j>=0;j--){
+                if(nums[j]<nums[i]){
+                    max=Math.max(max,dp1[j]);
+                }
+            }
+            
+            dp1[i]=max+1;
+        }
+        
+        dp2[n-1]=1;
+        
+        for(int i=n-2;i>=0;i--){
+            int max=0;
+            
+            for(int j=i+1;j<n;j++){
+                if(nums[j]<nums[i]){
+                    max=Math.max(max,dp2[j]);
+                }
+            }
+            
+            dp2[i]=max+1;
+        }
+        
+        int ans=1;
+        
+        for(int i=0;i<n;i++){
+            ans=Math.max(ans,dp1[i]+dp2[i]-1);
+        }
+        
+        return ans;
+    }
+}
+
+Question 43:
+Longest Common Substring
+Given two strings. The task is to find the length of the longest common substring.
+Example 1:
+
+Input: S1 = "ABCDGH", S2 = "ACDGHR", n = 6, m = 6
+Output: 4
+Explanation: The longest common substring
+is "CDGH" which has length 4.
+
+Ans:
+
+class Solution{
+    int longestCommonSubstr(String S1, String S2, int n, int m){
+        int[][]dp=new int[n+1][m+1];
+        int max=0;
+        for(int i=1;i<n+1;i++)
+        {
+            for(int j=1;j<m+1;j++)
+            {
+                if(S1.charAt(i-1)==S2.charAt(j-1))
+                {
+                    dp[i][j]=dp[i-1][j-1]+1;
+                    max=Math.max(max,dp[i][j]);
+                }
+            }
+        }
+        return max;
+    }
+}
+
+Question 44:
+Partitions with Given Difference
+
+Given an array arr, partition it into two subsets(possibly empty) such that their union is the original array. Let the sum of the element of these two subsets be S1 and S2. 
+Given a difference d, count the number of partitions in which S1 is greater than or equal to S2 and the difference S1 and S2 is equal to d. since the answer may be large return it modulo 109 + 7.
+Example 1:
+
+Input:
+n = 4, d = 3
+arr[] =  { 5, 2, 6, 4}
+Output:
+1
+Explanation:
+There is only one possible partition of this array. Partition : {6, 4}, {5, 2}. The subset difference between subset sum is: (6 + 4) - (5 + 2) = 3.
+Ans:
+class Solution{
+    int findSum(int[]arr){
+        int sum=0;
+        for(int it:arr)
+            sum+=it;
+        return sum;
+    }
+    public int countPartitions(int n, int d, int arr[]){
+        int s=findSum(arr);
+        int Sum=s+d;
+        if(Sum%2!=0)
+            return 0;
+        Sum=Sum/2;
+        int[]dp=new int[Sum+1];
+	    if(arr[0]<=Sum)
+	        dp[arr[0]]=1;
+	    if(arr[0]==0)
+	        dp[0]=2;
+	    else dp[0]=1;
+	    for(int ind=1;ind<n;ind++){
+	        int[]temp=new int[Sum+1];
+	        for(int sum=0;sum<=Sum;sum++){
+	           int left=0;
+	    if(arr[ind]<=sum)
+	       left=dp[sum-arr[ind]];
+	   int right=dp[sum];
+	   temp[sum]=(left+right)%N; 
+	        }
+	        dp=temp;
+	    }
+	    return dp[Sum];
+    }
+    int N=(int)1e9+7;
+}
+
+Question 45:
+Rod Cutting
+Given a rod of length N inches and an array of prices, price[]. price[i] denotes the value of a piece of length i. Determine the maximum value obtainable by cutting up the rod and selling the pieces.
+Note: Consider 1-based indexing.
+Example 1:
+
+Input:
+N = 8
+Price[] = {1, 5, 8, 9, 10, 17, 17, 20}
+Output:
+22
+Explanation:
+The maximum obtainable value is 22 by 
+cutting in two pieces of lengths 2 and 
+6, i.e., 5+17=22.
+
+Ans:
+
+class Solution{
+    public int cutRod(int price[], int n) {
+       int dp[]=new int[n+1];
+       for(int i=0; i<=n; i++){
+           for(int j=0; j<i; j++){
+               dp[i]=Math.max(dp[i], price[j]+dp[i-j-1]);
+           }
+       }
+       return dp[n];
+        //code here
+    }
+}
+
+Question 46:
+ Frog Jump
+A frog is crossing a river. The river is divided into some number of units, and at each unit, there may or may not exist a stone. The frog can jump on a stone, but it must not jump into the water.
+Given a list of stones positions (in units) in sorted ascending order, determine if the frog can cross the river by landing on the last stone. Initially, the frog is on the first stone and assumes the first jump must be 1 unit.
+If the frog's last jump was k units, its next jump must be either k - 1, k, or k + 1 units. The frog can only jump in the forward direction.
+Example 1:
+
+Input: stones = [0,1,3,5,6,8,12,17]
+Output: true
+Explanation: The frog can jump to the last stone by jumping 1 unit to the 2nd stone, then 2 units to the 3rd stone, then 2 units to the 4th stone, then 3 units to the 6th stone, 4 units to the 7th stone, and 5 units to the 8th stone.
+Ans:
+class Solution {
+    int[] stones;
+    boolean[][] visited;
+    public boolean canCross(int[] stones) {
+        if (stones[1] != 1 || stones[stones.length - 1] > 2001000)
+            return false;
+        this.stones = stones;
+        visited = new boolean[stones.length][stones.length];
+        return canCross(1, 1);
+    }
+    public boolean canCross(int stone, int lastJump) {
+        // River Crossed!
+        if (stone >= stones.length - 1) return true;
+
+        if (visited[stone][lastJump]) return false;
+        visited[stone][lastJump] = true;
+
+        int nextStone = stone + 1;
+        while (nextStone < stones.length && stones[nextStone] < stones[stone] + lastJump - 1)
+            nextStone++;
+
+        // Consider lastJump - 1
+        if (nextStone < stones.length && stones[nextStone] == stones[stone] + lastJump - 1 
+                && canCross(nextStone++, lastJump - 1))
+            return true;
+        // Consider lastJump
+        if (nextStone < stones.length && stones[nextStone] == stones[stone] + lastJump 
+                && canCross(nextStone++, lastJump))
+            return true;
+        // Consider lastJump + 1
+        return nextStone < stones.length && stones[nextStone] == stones[stone] + lastJump + 1
+                && canCross(nextStone, lastJump + 1);
+    }
+}
+Question 47:
+Frog Jump II
+You are given a 0-indexed integer array stones sorted in strictly increasing order representing the positions of stones in a river.
+A frog, initially on the first stone, wants to travel to the last stone and then return to the first stone. However, it can jump to any stone at most once.
+The length of a jump is the absolute difference between the position of the stone the frog is currently on and the position of the stone to which the frog jumps.
+More formally, if the frog is at stones[i] and is jumping to stones[j], the length of the jump is |stones[i] - stones[j]|.
+The cost of a path is the maximum length of a jump among all jumps in the path.
+Return the minimum cost of a path for the frog.
+Example 1:
+Input: stones = [0,2,5,6,7]
+Output: 5
+Explanation: The above figure represents one of the optimal paths the frog can take.
+The cost of this path is 5, which is the maximum length of a jump.
+Since it is not possible to achieve a cost of less than 5, we return it.
+Ans:
+class Solution {
+    public int maxJump(int[] stones) {
+        int ans = stones[1]; 
+        for (int i = 2; i < stones.length; ++i) 
+            ans = Math.max(ans, stones[i] - stones[i-2]); 
+        return ans; 
+    }
+}
+
+Question 48:
+Minimal Cost
+There are n stones and an array of heights and Geek is standing at stone 1 and can jump to one of the following: Stone i+1, i+2, ... i+k stone and cost will be [hi-hj] is incurred, where j is the stone to land on. Find the minimum possible total cost incurred before the Geek reaches Stone N.
+Example 1:
+Input:
+n = 5, k = 3
+heights = {10, 30, 40, 50, 20}
+Output:
+30
+Explanation:
+Geek will follow the path 1->2->5, the total cost 
+would be | 10-30| + |30-20| = 30, which is minimum
+
+Ans:
+class Solution{
+    public int f(int[] arr,int n,int k,int[] dp){
+        if(n < 0) return Integer.MAX_VALUE; 
+        if(dp[n] != -1) return dp[n];
+        if(n == 0) return 0;
+        int minValue = Integer.MAX_VALUE;
+        for(int i = 1; i <= k ; i++ ){
+            if(n-i >= 0){
+                int temp = f(arr,n-i,k,dp)+Math.abs(arr[n]-arr[n-i]);
+                minValue = Math.min(minValue,temp);
+            }
+            else{
+                break;
+            }
+        }
+        dp[n] = minValue;
+        return dp[n];
+    }
+    public int minimizeCost(int arr[],int N,int K){
+        //code here
+        int[] dp = new int[N+1];
+        dp[0] = 0;
+        dp[1] = Math.abs(arr[0]-arr[1]);
+        for(int i = 2; i < N; i++){
+            int minValue = Integer.MAX_VALUE;
+            for(int j = 1; j <= K; j++){
+                if(i-j >= 0){
+                    int temp = dp[i-j] + Math.abs(arr[i]-arr[i-j]);
+                    minValue = Math.min(minValue,temp);
+                }
+                else{
+                    break;
+                }
+            }
+            dp[i] = minValue;
+        }
+        return dp[N-1];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Geeks of Geeks & Leetcode
+
+Topic: Job Scheduling 
+
+
+Question 1:
+Shortest Job first
+Geek is a software engineer. He is assigned with the task of calculating average waiting time of all the processes by following shortest job first policy.
+The shortest job first (SJF) or shortest job next, is a scheduling policy that selects the waiting process with the smallest execution time to execute next.
+Given an array of integers bt of size n. Array bt denotes the burst time of each process. Calculate the average waiting time of all the processes and return the nearest integer which is smaller or equal to the output.
+Note: Consider all process are available at time 0.
+Example 1:
+Input:
+n = 5
+bt = [4,3,7,1,2]
+Output: 4
+Explanation: After sorting burst times by shortest job policy, calculated average waiting time is 4.
+Ans:
+class Solution {
+    static int solve(int bt[] ) {
+    // code here
+    Arrays.sort(bt);
+    int n = bt.length;
+    int total = 0, sum = bt[0];
+    for(int i=1; i<n; i++){
+        total += sum;
+        sum += bt[i];
+    }
+    return (int)Math.floor((double)total/n);
+  }
+}
+
+Question 2:
+Calculate the average Waiting Time and Turnaround Time using Shortest Job First
+Given N processes with their arrivalTime and burstTime. The task is to return the average waitingTime and Turnaround time for the given processes.
+Shortest job first (SJF) or shortest job next, is a scheduling policy that selects the waiting process with the smallest execution time to execute next. It is a non-preemptive algorithm and no process is interrupted until it is completed, and after that processor switches to another process).
+Completion Time: Time at which process completes its execution.
+Turn Around Time: Time Difference between completion time and arrival time. Turn Around Time = Completion Time - Arrival Time
+Waiting Time(W.T): Time Difference between turn around time and burst time. 
+Waiting Time = Turn Around Time -  Burst Time
+Example 1:
+Input:
+arrivalTime[] = {0, 0, 0}
+burstTime[] = {4, 2, 3}
+Output: {2.33, 5.33}
+Explanation: 
+Since Process 2 has the smallest burst time, it gets executed first.
+Hence, Completetion time = 2
+Next Process 3, has burst tme of 3, hence it gets executed. 
+Completion time = 2 + 3 = 5.
+Process 1, has burst tme of 4, hence it gets executed.
+Completion time = 5 + 4 = 9.
+Turnaround time = Completion Time - Arrival time
+So, 
+Process 1, Turnaround time = 9 - 0 = 9
+Process 2, Turnaround time = 2 - 0 = 2
+Process 3, Turnaround time = 5 - 0 = 5
+Waiting time = Turnaround time - Burst Time
+So,
+Process 1, Waiting time = 9 - 4 = 5
+Process 2, Waiting time = 2 - 2 = 0
+Process 3, Waiting time = 5 - 3 = 2
+Average waiting time = (5 + 0 + 2)/3 = 2.33
+Average t tiurnaround time = (9 + 2 + 5)/3 = 5.33
+Your Task:  
+You don't need to read input or print anything. Your task is to complete the function averageTimes() which takes two arrays array of size N and returns a list containing two doubles.
+Note : Return double up rounded up to two decimal places..
+Expected Time Complexity: O(N2)
+Expected Auxiliary Space: O(N)
+Ans:
+class Solution{
+    public:
+    double round(double var){
+        double value = (int)(var * 100 + .5);
+        return (double)value / 100;
+    }
+    vector<double>averageTimes(vector<int>arrivalTime, vector<int>burstTime, int n){
+        vector<int>completionTime(n);
+        vector<int>turnAroundTime(n);
+        vector<int>waitingTime(n);
+        vector<int>completed(n);
+    
+        int systemTime = 0, totalProcesses = 0;
+        double avgwaitingTime = 0, avgturnAroundTime = 0;
+    
+        // Initializing all process as undone
+        for (int i = 0; i < n; i++) 
+        {
+            completed[i] = 0;
+        }
+    
+        // Till all the processes are done
+        while (totalProcesses != n) 
+        {
+            int check = n, min = INT_MAX;
+    
+            for (int i = 0; i < n; i++) 
+            {
+                /*
+                    If the process arrival time is less than system time and it is not completed
+                    and burstTime is smallest of this process this process will be executed first
+                */
+                if ((arrivalTime[i] <= systemTime) and (completed[i] == 0) and (burstTime[i] < min)) 
+                {
+                    min = burstTime[i];
+                    check = i;
+                }
+            }
+    
+            // No process in the queue.
+            if (check == n) 
+            {
+                systemTime++;
+            }
+            else 
+            {
+                completionTime[check] = systemTime + burstTime[check];
+                systemTime += burstTime[check];
+                turnAroundTime[check] = completionTime[check] - arrivalTime[check];
+                waitingTime[check] = turnAroundTime[check] - burstTime[check];
+                completed[check] = 1;
+                totalProcesses++;
+            }
+        }
+    
+        // Sum for calculating averages
+        for (int i = 0; i < n; i++) 
+        {
+            avgwaitingTime += waitingTime[i];
+            avgturnAroundTime += turnAroundTime[i];
+        }
+    
+        vector<double>ans(2);
+    
+        ans[0] = (double) (avgwaitingTime / n);
+        ans[1] = (double) (avgturnAroundTime / n);
+    
+        double res1 = round(ans[0]);
+        double res2 = round(ans[1]);
+        return {res1, res2};
+    }
+};
+
+Question 3:
+Maximum Profit in Job Scheduling
+We have n jobs, where every job is scheduled to be done from startTime[i] to endTime[i], obtaining a profit of profit[i].
+You're given the startTime, endTime and profit arrays, return the maximum profit you can take such that there are no two jobs in the subset with overlapping time range.
+If you choose a job that ends at time X you will be able to start another job that starts at time X.
+Example 1:
+
+Input: startTime = [1,2,3,3], endTime = [3,4,5,6], profit = [50,10,40,70]
+Output: 120
+Explanation: The subset chosen is the first and fourth job. 
+Time range [1-3]+[3-6] , we get profit of 120 = 50 + 70.
+ Ans:
+ class Solution {
+    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        int ans= helper(startTime,endTime,profit);
+         return ans;
+    }
+    public int helper(int[] startTime, int[] endTime, int[] profit){
+      
+        quickSort(endTime,startTime,profit,0,endTime.length-1);
+        
+        
+        
+        TreeMap <Integer,Integer> dp = new TreeMap<>();
+        dp.put(0,0);
+        for(int i =0;i<profit.length;i++){
+            int val = profit[i]+dp.floorEntry(startTime[i]).getValue();
+            if(val > dp.lastEntry().getValue()){
+                dp.put(endTime[i],val);
+            }
+        }
+        return dp.lastEntry().getValue();
+
+    }
+
+     public void printArray(int[] arr, int size)
+    {
+        for (int i = 0; i < size; i++)
+            System.out.print(arr[i] + " ");
+  
+        System.out.println();
+    }
+    
+    
+    
+    
+      public void swap(int[] arr, int i, int j)
+    {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    public int partition(int[] arr,int[] endTime, int[] profit, int low, int high)
+    {
+        int pivot = arr[high];
+        int i = (low - 1);
+        for (int j = low; j <= high - 1; j++) {
+            if (arr[j] < pivot) {
+                i++;
+                swap(arr, i, j);
+                swap(endTime, i, j);
+                swap(profit, i, j);
+            }
+        }
+        swap(arr, i + 1, high);
+        swap(endTime, i+1, high);
+        swap(profit, i+1, high);
+        return (i + 1);
+    }
+    public void quickSort(int[] arr, int[] endTime, int[] profit, int low, int high)
+    {
+        if (low < high) {
+            int pi = partition(arr,endTime,profit, low, high);
+            quickSort(arr,endTime,profit, low, pi - 1);
+            quickSort(arr,endTime,profit, pi + 1, high);
+        }
+    }
+}
+
+
+Question 4:
+Minimum Difficulty of a Job Schedule
+You want to schedule a list of jobs in d days. Jobs are dependent (i.e To work on the ith job, you have to finish all the jobs j where 0 <= j < i).
+You have to finish at least one task every day. The difficulty of a job schedule is the sum of difficulties of each day of the d days. The difficulty of a day is the maximum difficulty of a job done on that day.
+You are given an integer array jobDifficulty and an integer d. The difficulty of the ith job is jobDifficulty[i].
+Return the minimum difficulty of a job schedule. If you cannot find a schedule for the jobs return -1.
+Input: jobDifficulty = [6,5,4,3,2,1], d = 2
+Output: 7
+Explanation: First day you can finish the first 5 jobs, total difficulty = 6.
+Second day you can finish the last job, total difficulty = 1.
+The difficulty of the schedule = 6 + 1 = 7 
+Ans:
+class Solution {
+    public int minDifficulty(int[] jobDifficulty, int d) {
+        int len = jobDifficulty.length;
+        if (d > len) return -1;
+        int[][] minDifficulty = new int[d][len];
+        for (int i = 1; i < d; i++) {
+            Arrays.fill(minDifficulty[i], Integer.MAX_VALUE);
+        }
+        int maxDifficulty = 0;
+        for (int i = 0; i <= len - d; i++) {
+            maxDifficulty = Math.max(maxDifficulty, jobDifficulty[i]);
+            minDifficulty[0][i] = maxDifficulty;
+        }
+        for (int day = 1; day < d; day++) {
+            for (int to = day; to <= len - d + day; to++) {
+                int currentDayDifficulty = jobDifficulty[to];
+                int result = Integer.MAX_VALUE;
+                for (int j = to - 1; j >= day - 1; j--) {
+                    result = Math.min(result, minDifficulty[day - 1][j] + currentDayDifficulty);
+                    currentDayDifficulty = Math.max(currentDayDifficulty, jobDifficulty[j]);
+                }
+                minDifficulty[day][to] = result;
+            }   
+        }
+        return minDifficulty[d - 1][len - 1];
+    }
+}
+
+Question 5:
+Find Minimum Time to Finish All Jobs
+You are given an integer array jobs, where jobs[i] is the amount of time it takes to complete the ith job.
+There are k workers that you can assign jobs to. Each job should be assigned to exactly one worker. The working time of a worker is the sum of the time it takes to complete all jobs assigned to them. Your goal is to devise an optimal assignment such that the maximum working time of any worker is minimized.
+Return the minimum possible maximum working time of any assignment.
+Example 1:
+Input: jobs = [3,2,3], k = 3
+Output: 3
+Explanation: By assigning each person one job, the maximum time is 3.
+Ans:
+public int minimumTimeRequired(int[] jobs, int k) {
+        Arrays.sort(jobs);
+        int n = jobs.length;
+        int left = jobs[n - 1];
+        int right = jobs[n - 1] * n;
+        while (left < right) {
+            int[] cap = new int[k];
+            int mid = left + (right - left) / 2;
+            Arrays.fill(cap, mid);
+            if (dfs(jobs, cap, n - 1, k, mid)) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
+
+    private boolean dfs(int[] jobs, int[] cap, int i, int k, int x) {
+        if (i == -1) {
+            return true;
+        }
+        for (int j = 0; j < k; j++) {
+            if (cap[j] >= jobs[i]) {
+                cap[j] -= jobs[i];
+                if (dfs(jobs, cap, i - 1, k, x)) {
+                    return true;
+                }
+                cap[j] += jobs[i];
+            }
+            if (cap[j] == x) {
+                break;
+            }
+        }
+        return false;
+    }
+
+Topic Huffman coding 
+Question 1:
+Huffman Encoding
+Given a string S of distinct character of size N and their corresponding frequency f[ ] i.e. character S[i] has f[i] frequency. Your task is to build the Huffman tree print all the huffman codes in preorder traversal of the tree.
+Note: While merging if two nodes have the same value, then the node which occurs at first will be taken on the left of Binary Tree and the other one to the right, otherwise Node with less value will be taken on the left of the subtree and other one to the right.
+Example 1:
+S = "abcdef"
+f[] = {5, 9, 12, 13, 16, 45}
+Output: 
+0 100 101 1100 1101 111
+HuffmanCodes will be:
+f : 0
+c : 100
+d : 101
+a : 1100
+b : 1101
+e : 111
+Hence printing them in the PreOrder of Binary 
+Tree.
+Ans:
+class Node
+{
+    int data;
+    Node left;
+    Node right;
+    public Node(int d)
+    {
+        data=d;
+        left=null;
+        right=null;
+    }
+}
+class CustomComp implements Comparator<Node>
+{
+    public int compare(Node a, Node b)
+    {
+        // return (a.data-b.data);
+        // if(a.data==b.data)
+        // return 1;
+        // else if(a.data>b.data)
+        // return 1;
+        // else
+        // return -1;
+        // return (a.data-b.data);
+        
+        if(a.data>=b.data)
+        return 1;
+        else
+        return -1;
+        
+    }
+}
+
+class Solution {
+    public void  traverse(Node root, ArrayList<String> ans, String temp )
+    {
+        if(root.left==null && root.right==null)
+        {
+            ans.add(temp);
+            return;
+        }
+        // if(root!=null)
+        // {
+            
+        // }
+        // ans.add(temp);
+        traverse(root.left, ans, temp+'0');
+        traverse(root.right, ans, temp+'1');
+    }
+    public ArrayList<String> huffmanCodes(String S, int f[], int N)
+    {
+        // Code here
+        // int n=S.length();
+        PriorityQueue<Node>pq=new PriorityQueue<>(new CustomComp());
+        for(int i=0;i<N;i++)
+        {
+            Node temp=new Node(f[i]);
+            pq.add(temp);
+        }
+        while(pq.size()>1)
+        {
+            Node l=pq.poll();
+            // System.out.println(l.data);
+            Node r=pq.poll();
+            // System.out.println(r.data);
+            Node temp=new Node(l.data+r.data);
+            temp.left=l;
+            temp.right=r;
+            pq.add(temp);
+        }
+        Node root=pq.poll();
+        ArrayList<String> ans=new ArrayList<>();
+        String temp="";
+        traverse(root, ans,  temp  );
+        return ans;
+    }
+}
+
+Topic: coin exxchnage problem
+
+Question: 1
+Frobenius coin problem
+Given two coins of denominations X and Y respectively, find the largest amount that cannot be obtained using these two coins (assuming infinite supply of coins) followed by the total number of such non obtainable amounts.
+Example 1:
+Input: X = 2, Y = 5
+Output: 3 2
+Explanation: 3 is the largest amount that
+can not be formed using 2 and 5. And there 
+are only 2 such non obtainable amounts and 
+they are 1 and 3.
+Ans:
+
+class Solution
+{
+     public int[] frobenius(int X, int Y)
+    {
+        if (gcd(X, Y) > 1)
+            return new int[]{-1};
+            
+        int[] ans = new int[2];
+        ans[0] = X * Y - (X + Y);
+        ans[1] = (X - 1) * (Y - 1) / 2;
+        
+        return ans;
+    }
+    int gcd(int a, int b)
+    {
+        if (b == 0)
+            return a;
+            
+        return gcd(b, a % b);
+    }
+}
+
+Question 2:
+Coin Piles
+There are N piles of coins each containing  Ai (1<=i<=N) coins. Find the minimum number of coins to be removed such that the absolute difference of coins in any two piles is at most K.
+Note: You can also remove a pile by removing all the coins of that pile.
+Example 1:
+Input:
+N = 4, K = 0
+arr[] = {2, 2, 2, 2}
+Output:
+0
+Explanation:
+For any two piles the difference in the
+number of coins is <=0. So no need to
+remove any coins. 
+Ans:
+class Solution {
+    static int minSteps(int[] arr, int n, int k) 
+    {
+        Arrays.sort(arr);
+        int[] subset = new int[n];
+        subset[n-1] = arr[n-1];
+        for(int i =n-2 ; i >= 0 ; i--)
+        {
+            subset[i] = arr[i] + subset[i+1];
+        }
+        int min = Integer.MAX_VALUE;
+        int Sum = 0;
+        for(int i =0; i< n; i++){
+            int ind = findUpper(arr , arr[i] + k , i , n-1);
+            if(ind == -1)
+            {
+                min = Math.min(min , Sum); 
+                continue;
+            }
+            int curr = subset[ind] - ((n - ind) *(arr[i]+k));
+            curr += Sum;
+            min = Math.min(min , curr);
+            Sum += arr[i];
+        }
+        return min;
+    }
+    static int findUpper(int[] arr , int target,  int s , int e)
+    {
+        int answer = -1;
+        while(s <= e)
+        {
+            int mid = (s+e)/2;
+            if(arr[mid] > target)
+            {
+                answer = mid;
+                e = mid - 1;
+            }
+            else
+            {
+                s = mid + 1;
+            }
+        }
+        return answer;
+    }
+};
+
+Question 3:
+Coin Change II
+You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+Return the number of combinations that make up that amount. If that amount of money cannot be made up by any combination of the coins, return 0.
+You may assume that you have an infinite number of each kind of coin.
+The answer is guaranteed to fit into a signed 32-bit integer.
+Example 1:
+Input: amount = 5, coins = [1,2,5]
+Output: 4
+Explanation: there are four ways to make up the amount:
+5=5
+5=2+2+1
+5=2+1+1+1
+5=1+1+1+1+1
+
+Ans:
+
+class Solution {
+    public int change(int amount, int[] coins) {
+        int[] dp = new int[amount + 1];
+        dp[0] = 1;
+
+        for(int c : coins) {
+            for(int i = c; i <= amount; i++) {
+                dp[i] += dp[i - c];  
+            }
+        }
+
+        return dp[amount];
+    }
+}
+Question 4:
+ Maximum Value of K Coins From Piles
+There are n piles of coins on a table. Each pile consists of a positive number of coins of assorted denominations.
+In one move, you can choose any coin on top of any pile, remove it, and add it to your wallet.
+Given a list piles, where piles[i] is a list of integers denoting the composition of the ith pile from top to bottom, and a positive integer k, return the maximum total value of coins you can have in your wallet if you choose exactly k coins optimally.
+Example:
+Input: piles = [[1,100,3],[7,8,9]], k = 2
+Output: 101
+Explanation:
+The above diagram shows the different ways we can choose k coins.
+The maximum total we can obtain is 101.
+Ans:
+class Solution {
+    public int maxValueOfCoins(List<List<Integer>> piles, int k) {
+        //dp[i][j] means when we just use the first i piles and j picks, the maximum coins we can get
+        int[][] dp = new int[piles.size()+1][k+1];
+        for (int i = 1; i <= piles.size(); i++){
+            for (int j = 1; j <= k; j++){
+                int sum = 0;
+                // At first we don't pick anything, so the coins you can get is the same and for i-1 condition
+                dp[i][j] = dp[i-1][j];
+                //Begin to traverse the ith pile
+                //Note here we use min function to prevent index out of bound
+                for (int h = 0; h < Math.min(j, piles.get(i-1).size()); h++){
+                    //We take the current (hth) coin
+                    sum += piles.get(i-1).get(h);
+                    //Check if pick it can maximize our score
+                    //Note that if we pick it, we can only get the coins for j-1-h picks when we are at i-1th coin
+                    dp[i][j] = Math.max(dp[i][j], sum + dp[i-1][j-1-h]);
+                }
+            }
+        }
+        //The result is when we use all of the piles and k picks
+        return dp[piles.size()][k]; 
+    }
+}
+
+Question 5:
+Maximum Number of Coins You Can Get
+There are 3n piles of coins of varying size, you and your friends will take piles of coins as follows:
+In each step, you will choose any 3 piles of coins (not necessarily consecutive).
+Of your choice, Alice will pick the pile with the maximum number of coins.
+You will pick the next pile with the maximum number of coins.
+Your friend Bob will pick the last pile.
+Repeat until there are no more piles of coins.
+Given an array of integers piles where piles[i] is the number of coins in the ith pile.
+Return the maximum number of coins that you can have.
+Example 1:
+Input: piles = [2,4,1,2,7,8]
+Output: 9
+Explanation: Choose the triplet (2, 7, 8), Alice Pick the pile with 8 coins, you the pile with 7 coins and Bob the last one.
+Choose the triplet (1, 2, 4), Alice Pick the pile with 4 coins, you the pile with 2 coins and Bob the last one.
+The maximum number of coins which you can have are: 7 + 2 = 9.
+On the other hand if we choose this arrangement (1, 2, 8), (2, 4, 7) you only get 2 + 4 = 6 coins which is not optimal.
+Ans:
+class Solution {
+    public int maxCoins(int[] piles) {
+        int max=0;
+        Arrays.sort(piles);
+        int temp=piles.length/3;
+        for(int i=piles.length-2;temp-- >0;i-=2){
+            max+=piles[i];
+        }
+        return max;
+    }
+}
+
+Question 6:
+2920. Maximum Points After Collecting Coins From All
+There exists an undirected tree rooted at node 0 with n nodes labeled from 0 to n - 1. You are given a 2D integer array edges of length n - 1, where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the tree. You are also given a 0-indexed array coins of size n where coins[i] indicates the number of coins in the vertex i, and an integer k.
+Starting from the root, you have to collect all the coins such that the coins at a node can only be collected if the coins of its ancestors have been already collected.
+Coins at nodei can be collected in one of the following ways:
+Collect all the coins, but you will get coins[i] - k points. If coins[i] - k is negative then you will lose abs(coins[i] - k) points.
+Collect all the coins, but you will get floor(coins[i] / 2) points. If this way is used, then for all the nodej present in the subtree of nodei, coins[j] will get reduced to floor(coins[j] / 2).
+Return the maximum points you can get after collecting the coins from all the tree nodes.
+Example 1:
+Input: edges = [[0,1],[1,2],[2,3]], coins = [10,10,3,3], k = 5
+Output: 11                        
+Explanation: 
+Collect all the coins from node 0 using the first way. Total points = 10 - 5 = 5.
+Collect all the coins from node 1 using the first way. Total points = 5 + (10 - 5) = 10.
+Collect all the coins from node 2 using the second way so coins left at node 3 will be floor(3 / 2) = 1. Total points = 10 + floor(3 / 2) = 11.
+Collect all the coins from node 3 using the second way. Total points = 11 + floor(1 / 2) = 11.
+It can be shown that the maximum points we can get after collecting coins from all the nodes is 11. 
+Ans:
+class Solution {
+    public int maximumPoints(int[][] edges, int[] coins, int k) {
+        int n = coins.length;
+        List<List<Integer>> g = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            g.add(new ArrayList<>());
+        }
+
+        for (int[] edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            g.get(u).add(v);
+            g.get(v).add(u);
+        }
+
+        Integer[][] dp = new Integer[n][15];
+
+        Function<Integer, Integer> dfs = node -> {
+            if (dp[node][k] != null) {
+                return dp[node][k];
+            }
+            if (k >= 14) {
+                return dp[node][k] = 0;
+            }
+
+            int currCoins = coins[node];
+            for (int j = 0; j < k; j++) {
+                currCoins /= 2;
+            }
+
+            int way1 = currCoins - k;
+            int way2 = currCoins / 2;
+
+            for (int child : g.get(node)) {
+                if (dp[child][k] == null) {
+                    dp[child][k] = dfs.apply(child);
+                }
+                if (dp[child][k + 1] == null) {
+                    dp[child][k + 1] = dfs.apply(child);
+                }
+                way1 += dp[child][k];
+                way2 += dp[child][k + 1];
+            }
+
+            return dp[node][k] = Math.max(way1, way2);
+        };
+
+        dfs.apply(0);
+
+        return dp[0][0];
+    }
+}
+
+
+Topic: Knapsack problem
+
+Question 1:
+Knapsack with Duplicate Items
+Given a set of N items, each with a weight and a value, represented by the array w and val respectively. Also, a knapsack with weight limit W.
+The task is to fill the knapsack in such a way that we can get the maximum profit. Return the maximum profit.
+Note: Each item can be taken any number of times.
+Example 1:
+Input: 
+N = 2
+W = 3
+val = {1, 1}
+wt = {2, 1}
+Output: 
+3
+Explanation: 
+1.Pick the 2nd element thrice.
+2.Total profit = 1 + 1 + 1 = 3. Also the total weight = 1 + 1 + 1  = 3 which is <= 3.
+Ans:
+class Solution{
+    static int knapSack(int N, int W, int val[], int wt[])
+    {
+        
+        int[] dp=new int[W+1];
+        dp[0]=0;
+        int max=0;
+        int bag=0;
+        for(int i=1; i<=W; i++){
+            max=0;
+            for(int j=0; j<N; j++){
+                if(wt[j]<=i){
+                    int rbag=i-wt[j];
+                    bag=val[j] + dp[rbag];
+                }
+                if(max<bag){
+                    max=bag;
+                }
+            }
+            dp[i]=max;
+        }
+        return dp[W];
+        // code here
+    }
+}
+
+Topic: Longest Common Subsequence
+Question 1:
+Longest Common Subsequence
+Given two strings, find the length of longest subsequence present in both of them. Both the strings are in uppercase latin alphabets.
+Example 1:
+Input:
+A = 6, B = 6
+str1 = ABCDGH
+str2 = AEDFHR
+Output: 3
+Explanation: LCS for input strings “ABCDGH” and “AEDFHR” is “ADH” of length 3.
+Ans:
+class Solution
+{
+    
+    public static int lcsutil(int a, int b, String c, String d, int[][] d1){
+        if(a==0 || b==0){return 0;}
+        if(d1[a][b] !=-1){
+            return d1[a][b];
+        }
+        if(c.charAt(a-1)==d.charAt(b-1)){
+            d1[a][b]=1+lcsutil(a-1,b-1,c,d,d1);
+            return d1[a][b];
+        }
+        else {
+            return d1[a][b]=Math.max(lcsutil(a,b-1,c,d,d1),lcsutil(a-1,b,c,d,d1));
+        }
+    }
+    //Function to find the length of longest common subsequence in two strings.
+    static int lcs(int x, int y, String s1, String s2)
+    {
+        int dp[][]=new int[x+1][y+1];
+  for(int i=1; i<=x; i++){
+      for(int j=1; j<=y; j++){
+          dp[i][j]=-1;
+      }
+  }
+  return lcsutil(x,y,s1,s2,dp);
+    }
+    
+        
+    
+
+        // your code here
+    
+}
+
+Question 2:
+Longest common prefix
+Given two strings str1 and str2 of the same length. Find the longest prefix of str1 which is common in str2.
+Example 1:
+Input: 
+str1 = "geeks"
+str2 = "dgeek"
+Output: 0 3
+Explanation: 
+Longest prefix from str1
+present in str2 is "geek" 
+starting at index 0 in str1
+and ending at index 3.
+Ans:
+class Solution {
+    public int[] longestCommonPrefix(String s1, String s2){
+        //code here
+        int arr[]=new int[2];
+        for(int i=1;i<s1.length();i++){
+            if(s2.contains(s1.substring(0,i))){;
+            arr[0]=0;
+            arr[1]=i-1;
+        }
+        }
+        return arr;
+    }
+}
+
+Question 3:
+Longest Common Prefix in an Array
+Given an array of N strings, find the longest common prefix among all strings present in the array.
+Example 1:
+Input:
+N = 4
+arr[] = {geeksforgeeks, geeks, geek,geezer}
+Output: gee
+Explanation: "gee" is the longest common
+prefix in all the given strings.
+Ans:
+class Solution{
+    String longestCommonPrefix(String arr[], int n){
+        String s = arr[0];
+        int idx=-1;
+         boolean flag= false;
+        for(int i=0;i<s.length();i++){
+            for(int j=1;j<arr.length;j++){
+                if(!arr[j].startsWith(s.substring(0,i+1))){
+                    idx=i;
+                    flag= true;
+                    break;
+                    
+                }
+            }
+            if(flag==true)
+                break;
+        }
+       if(flag==false)
+       return s;
+       else if(idx==0)
+       return "-1";
+       else return s.substring(0, idx);
+    
+    }
+}
+
+
+
+
+
